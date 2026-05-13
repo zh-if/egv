@@ -1,0 +1,226 @@
+<div class="modal-header">
+    <h3 class="modal-title">System settings</h3>
+</div>
+<div class="modal-body">
+    <form role="form" name="form">
+        <div class="row">
+	     <div class="form-group">
+			     <div class="col-md-12">
+			     <div class="col-md-3">
+			             <label>Cluster Network</label>
+			     </div>
+			     <div class="col-md-9">
+			     	     <input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="vpn_net" data-ng-model="vpn_net">
+			     </div>
+			     </div>
+			     <div class="col-md-12"><hr></div>
+			     <div class="col-md-12">
+                             <div class="col-md-3">
+                                     <label>Docker Network</label>
+			     </div>
+			     <div class="col-md-9">
+				     <input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="docker_net" data-ng-model="docker_net">
+                             </div>
+			     </div>
+			     <div class="col-md-12"><hr></div>
+                             <div class="col-md-12">
+                             <div class="col-md-3">
+                                     <label>NAT Network</label>
+			     </div>
+			     <div class="col-md-9">
+			             <input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="nat_net" data-ng-model="nat_net">
+                             </div>
+			     </div>
+	     </div>
+	     <div class="col-md-12"><hr></div>
+             <div class="form-group">
+                <div class="col-md-12">
+		    <div class="col-md-3">
+			<label>Radius Server #1</label>
+		    </div>
+		    <div class="col-md-4">
+			<label>IP</label><input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="radius_server_ip" data-ng-model="radius_server_ip">
+		    </div>
+		    <div class="col-md-2">
+			 <label>Port</label><input type="number" class="form-control" name="radius_server_ip" data-ng-model="radius_server_port">
+		    </div> 
+		    <div class="col-md-2"> 
+			 <label>Secret</label><input type="password" class="form-control" name="radius_server_secret" data-ng-model="radius_server_secret">
+		    </div>
+		</div> 
+            </div>
+
+             <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <label>Radius Server #2</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label>IP</label><input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="radius_server_ip_2" data-ng-model="radius_server_ip_2">
+                    </div>
+                    <div class="col-md-2">
+                         <label>Port</label><input type="number" class="form-control" name="radius_server_ip_2" data-ng-model="radius_server_port_2">
+                    </div>
+                    <div class="col-md-2">
+                         <label>Secret</label><input type="password" class="form-control" name="radius_server_secret_2" data-ng-model="radius_server_secret_2">
+                    </div>
+                </div>
+            </div>
+	    <div class="col-md-12"><hr></div>
+	    <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <label>Active Directory Server</label>
+                    </div>
+                    <div class="col-md-4">
+                        <label>IP</label><input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="ad_server_ip" data-ng-model="ad_server_ip">
+                    </div>
+                    <div class="col-md-2">
+                         <label>Port</label><input type="number" class="form-control" name="ad_server_port" data-ng-model="ad_server_port">
+                    </div>
+                    <div class="col-md-3">
+			    <label>Enable TLS&nbsp;&nbsp;&nbsp;</label></br><input type="checkbox" name="ad_server_tls" data-ng-model="ad_server_tls">
+        	    </div>
+                    <div class="col-md-12">
+                         <label>Base DN</label><input type="text" class="form-control" name="ad_server_dn" data-ng-model="ad_server_dn">
+                    </div>
+		     <div class="col-md-12">
+                         <label>EVE-NG Active Directory Group</label><input type="text" class="form-control" name="ad_server_group" data-ng-model="ad_server_group">
+                    </div>
+                </div>
+            </div>
+
+	    <div class="col-md-12"><hr></div>
+	    <div class="form-group">
+                <div class="col-md-12">
+                    <div class="col-md-3">
+                        <label>Proxy Server</label>
+                    </div>
+                    <div class="col-md-3">
+                        <label>IP</label><input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" ipmask="0.99" name="proxy_server" data-ng-model="proxy_server">
+                    </div>
+                    <div class="col-md-2">
+                         <label>Port</label><input type="number" class="form-control" name="proxy_server" data-ng-model="proxy_port">
+                    </div>
+                    <div class="col-md-2">
+                         <label>User</label><input type="text" class="form-control" name="proxy_user" data-ng-model="proxy_user">
+                    </div>
+                    <div class="col-md-2">
+                         <label>Password</label><input type="password" class="form-control" name="proxy_password" data-ng-model="proxy_password">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12"><hr></div>
+	    <div class="form-group">
+                <div class="col-md-3">
+                    <label>Template visibility</label>
+		</div>
+                <div class="col-md-4">
+                    <label>unprovisioned images&nbsp;&nbsp;&nbsp;</label><select name="template_disabled" data-ng-model="template_disabled">
+			<option value=".missing">Disable</option>
+			<option value=".hided">Hide</option>
+		    </select>
+		</div>
+             </div>
+            <div class="col-md-12"><hr></div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label>Licence check</label>
+                </div>
+                <div class="col-md-4">
+                    <label>User's login control&nbsp;&nbsp;&nbsp;</label><select name="lic_check" data-ng-model="lic_check">
+                        <option value="strict">Strict</option>
+                        <option value="logout">Auto logout</option>
+                    </select>
+                </div>
+             </div>
+	     <div class="col-md-12"><hr></div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label>Disk critical size</label>
+                </div>
+                <div class="col-md-4">
+		    <label>Minimal free space (GB)</label><input type="number" name="mindisk" data-ng-model="mindisk">
+		</div>
+             </div>
+	    <div class="col-md-12"><hr></div>
+            <div class="form-group">
+                <div class="col-md-3">
+                    <label>Html 5 terminal setting</label>
+                </div>
+                <div class="col-md-4">
+                    <label>Color scheme&nbsp;&nbsp;&nbsp;</label>
+			<select name="color_scheme" data-ng-model="color_scheme">
+				<option value="gray-black">gray-black</option>
+				<option value="white-black">white-black</option>
+				<option value="green-black">green-black</option>
+				<option value="black-white">black-white</option>
+			</select>
+                </div>
+                <div class="col-md-9 col-md-offset-3">
+                        <label>Font name&nbsp;&nbsp;&nbsp;</label>
+			<select name="font_name"   data-ng-model="font_name" data-ng-options="y for y in font_list track by y">
+			</select>
+                </div>
+		<div class="col-md-9 col-md-offset-3">
+			<label>Font size&nbsp;&nbsp;&nbsp;</label>
+			<input type="number" min="6" max="24"  name="font_size" data-ng-model="font_size">
+		</div>
+            </div>
+	    <div class="col-md-12"><hr></div>
+            <div class="form-group">
+		<div class="col-md-3">
+		<label>Management Interface setting</label>
+		</div>
+		<div class="col-md-4">
+		   <label>Enable IPV6&nbsp;&nbsp;&nbsp;</label><input type="checkbox" name="ipv6" data-ng-model="ipv6">
+		</div>
+	    </div>
+	    <div class="col-md-12"><hr></div>
+	    <div class="form-group">
+                <div class="col-md-3">
+                <label>Web service setting</label>
+                </div>
+                <div class="col-md-4">
+                   <label>Enable Caching&nbsp;&nbsp;&nbsp;</label><input type="checkbox" name="caching" data-ng-model="caching">
+                </div>
+            </div>
+	     <div class="col-md-12"><hr></div>
+            <div class="form-group">
+                <div class="col-md-3">
+                <label>CPU/Memory settings</label>
+                </div>
+                <div class="col-md-9">
+			<label>Dedicated CPU for Services (Reboot required)&nbsp;&nbsp;&nbsp;</label><input size=3 type="number" min="0" max="{{mproc}}" name="cpudedicate" data-ng-model="cpudedicate">
+                </div>
+		<div class="col-md-3">
+                </div>
+                <div class="col-md-9">
+                   <label>Numa Balancing&nbsp;&nbsp;&nbsp;</label><input type="checkbox" name="numa" data-ng-model="numa">
+                </div>
+            </div>
+       </div>
+    <div class="modal-footer">
+       <button type="submit" class="btn btn-success btn-flat" ng-click="saveSystemSettings()">Submit</button>
+       <button type="button" class="btn  btn-flat" data-ng-click="closeModal()">Cancel</button>
+    </div>
+   </form>
+</div>
+<script>
+$('[data-mask]').inputmask()
+$('[data-ng-model=vpn_net]').on("blur change", function () { $('[data-ng-model=vpn_net]').val($('[data-ng-model=vpn_net]').val().replace(/([0-9]*\.)([0-9]*\.)([0-9]*\.)([0-9]*)/,"$1$2$3.0")) 
+							     if (  $('[data-ng-model=vpn_net]').val() == ""  ) {
+								     $('[data-ng-model=vpn_net]').val("172.29.130.0")
+							     }
+})
+$('[data-ng-model=docker_net]').on("focusout", function () { $('[data-ng-model=docker_net]').val($('[data-ng-model=docker_net]').val().replace(/([0-9]*\.)([0-9]*\.)([0-9]*\.)([0-9]*)/,"$1$2.0.0"))
+							    if (  $('[data-ng-model=docker_net]').val() == ""  ) {
+								    $('[data-ng-model=docker_net]').val("172.17.0.0")
+							    }
+})
+$('[data-ng-model=nat_net]').on("focusout", function () { $('[data-ng-model=nat_net]').val($('[data-ng-model=nat_net]').val().replace(/([0-9]*\.)([0-9]*\.)([0-9]*\.)([0-9]*)/,"$1$2$3.0"))
+							    if (  $('[data-ng-model=nat_net]').val() == ""  ) {
+                                                                    $('[data-ng-model=nat_net]').val("172.29.129.0")
+                                                            }
+})
+</script>

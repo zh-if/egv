@@ -1,0 +1,107 @@
+ <!-- Main Header -->
+<header class="main-header" style="height: 50px;">
+    <nav class="navbar navbar-static-top navbar-static-top-eve">
+      <div class="container_mainheader">
+        <div class="navbar-header">
+          <a href="#/main" class="navbar-brand" data-ng-click="blockui('/main')" style="padding-top: 5px;"><img class="hidden-xs" src="/themes/adminLTE/unl_data/img/Logo_EVE_Color.png" style="width:104px;height:40px"></a>
+		   <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse pull-left" id="navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li><a><font color="#5a8eb0">Professional</font></a></li>
+            <li data-ng-click="blockui('/main')" class="{{ (currentPath == '/main') ? activeClass : emptyClass}}"><a href="#/main"><i class="fa fa-home" aria-hidden="true"></i> Main</a></li>
+            <li class="dropdown {{ (currentPath == '/usermgmt') ? activeClass : emptyClass}}">
+              <a class="dropdown-toggle pointer" data-toggle="dropdown"><i class="fa fa-wrench" aria-hidden="true"></i> Management <span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-main" role="menu">
+                <li ng-if="role=='admin'" data-ng-click="blockui('/usermgmt')" class="{{ (currentPath == '/usermgmt') ? activeClass : emptyClass}}"><a href="#!/usermgmt"><i class="fa fa-group"></i> User Management</a></li>
+                <li data-ng-click="blockui('/processmgmt')" class="{{ (currentPath == '/processmgmt') ? activeClass : emptyClass}}"><a href="#!/processmgmt"><i class="fa fa-hdd-o"></i> Node Management</a></li>
+                <li data-ng-click="blockui('/labmgmt')" class="{{ (currentPath == '/labmgmt') ? activeClass : emptyClass}}"><a href="#!/labmgmt"><i class="fa fa-hdd-o"></i> Lab Management</a></li>
+              </ul>
+            </li>
+			<li class="dropdown {{ (currentPath == '/syslog' || currentPath == '/sysstat') ? activeClass : emptyClass}}">
+              <a class="dropdown-toggle pointer" data-toggle="dropdown"><i class="fa fa-book" aria-hidden="true"></i> System <span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-main" role="menu">
+		<li ng-if="role=='admin'"><a href="" data-ng-click="openModal('systemsettings','','lg')"><i class="fa fa-group"></i> System Settings</a></li>
+		<li ng-if="role=='admin'" data-ng-click="blockui('/clustermgmt')" class="{{ (currentPath == '/clustermgmt') ? activeClass : emptyClass}}"><a href="#!/clustermgmt"><i class="fa fa-group"></i>Cluster Management</a></li>
+                <li data-ng-click="blockui('/sysstat')" class="{{ (currentPath == '/sysstat') ? activeClass : emptyClass}}"><a href="#!/sysstat"><i class="fa fa-adjust"></i> System Status</a></li>
+                <li data-ng-click="blockui('/syslog')" class="{{ (currentPath == '/syslog') ? activeClass : emptyClass}}"><a href="#!/syslog"><i class="fa fa-life-ring"></i> System Logs</a></li>
+		<li ng-if="role=='admin'" ng-click="stopAll()"><a href=""><i class="fa fa-times"></i> Stop All Nodes</a></li>
+              </ul>
+            </li>
+			<li class="dropdown">
+              <a class="dropdown-toggle pointer" data-toggle="dropdown"><i class="fa fa-info-circle" aria-hidden="true"></i> Information <span class="caret"></span></a>
+              <ul class="dropdown-menu dropdown-main" role="menu">
+	        <li><a href="/files/CookBook.pdf" target="cookbook"><i class="fa fa-book"></i> Cookbook </a></li>
+                <li><a href="https://www.eve-ng.net/" target="_blank"><i class="fa fa-info-circle"></i>About</a></li>
+                <li><a href="https://www.eve-ng.net/forum/" target="_blank"><i class="fa fa-comment"></i> Forum</a></li>
+                <li><a href="https://www.youtube.com/playlist?list=PLF8yvsYkPZQ0myW7aVMZ80k8FU04UUgjV" target="_blank"><i class="fa fa-youtube"></i> YouTube Channel</a></li>
+                <li><a href="https://webchat.eve-ng.net/" target="_blank"><i class="fa fa-question-circle"></i> Help on EVE-NG LiveChat</a></li>
+              </ul>
+            </li>
+	    <li ng-if="role=='admin'" class="dropdown">
+		<a class="dropdown-toggle pointer" data-toggle="dropdown"><i class="fa fa-info-circle" aria-hidden="true"></i> Licensing <span class="caret"></span></a>
+		<ul class="dropdown-menu dropdown-main" role="menu">
+		  <li><a href=""  data-ng-click="openModal('about','','sm')"><i class="fa fa-id-card-o"></i> License Information</a></li>
+		  <li><a href=""  data-ng-click="openModal('licreq')"><i class="fa fa-id-card-o"></i> License Request</a></li>
+		  <li><a href=""  data-ng-click="openModal('licupload')"><i class="fa fa-id-card-o"></i> License Upload</a></li>
+		</ul>
+	    </li>
+
+      <li>
+              <a href="http://www.eve-ng.net/" target="_blank">&copy;2024 EVE-NG</a>
+            </li>
+          </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+        <!-- Navbar Right Menu -->
+        <div class="navbar-custom-menu">
+          <ul class="nav navbar-nav">
+            <!-- User Account Menu -->
+            <li class="dropdown user user-menu">
+              <!-- Menu Toggle Button -->
+              <a class="pointer" data-ng-click="openModal('edituser', username);">
+                <!-- The user image in the navbar
+                <img src="/themes/adminLTE/dist/img/user2-160x160.jpg" class="user-image" alt="User Image">-->
+				<i class="fa fa-user" aria-hidden="true"></i>
+                <!-- hidden-xs hides the username on small devices so only the image appears. -->
+                <span>{{username}}</span>
+              </a>  
+            </li>
+			
+            <li class="user user-menu">
+          			<a href="" ng-click="logout()" >
+          			<i class="fa fa-sign-out" aria-hidden="true"></i>
+          			 <span class="hidden-xs"> Sign Out </span>
+          			</a>
+            </li>
+          </ul>
+        </div>
+	<div class="navbar-custom-menu" >
+         <ul class="nav navbar-nav">
+          <li>
+           <a><span>{{ clock | date:'HH:mm'}}</span></a>
+          </li>
+         </ul>
+        </div>
+	<div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                         <li>
+				 <a href="https://www.eve-ng.net/index.php/1845-2/" target="_blank"><span><font style="color: red">{{new_version}}</font></span></a>
+                        </li>
+                </ul>
+        </div>
+	<div class="navbar-custom-menu">
+                <ul class="nav navbar-nav">
+                         <li>
+                                 <a><span>EVE Version {{local_version}}</span></a>
+                        </li>
+                </ul>
+        </div>
+        <!-- /.navbar-custom-menu -->
+      </div>
+      <!-- /.container-fluid -->
+    </nav>
+  </header>

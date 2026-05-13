@@ -1,0 +1,113 @@
+    <div class="modal-header">
+        <button type="button" class="close" ng-click="closeModal()" >&times;</button>
+        <i class="glyphicon glyphicon-certificate pull-right pointer action-changeopacity" ng-click="opacity()"></i>
+        <h4 class="modal-title">Edit lab</h4>
+    </div>
+    <div class="modal-body">
+        <form id="form-lab-edit" class="form-horizontal form-lab-edit" name="formLabEdit" >
+	        <div class="row">
+		        <div class="col-md-4">
+		            <div class="form-group row required">
+		                <label class="col-md-2 control-label control-label_custom_pos">Path</label>
+		                <div class="col-md-10">
+		                    <input class="form-control" name="path" ng-model="fullPathToFile" disabled="" type="text">
+		                </div>
+		            </div>
+		            <div class="form-group row required">
+		                <label class="col-md-2 control-label control-label_custom_pos">Name</label>
+		                <div class="col-md-10">
+		                    <input class="form-control autofocus" name="name" ng-model="labName" required ng-disabled="(role == 'user')?true:false" type="text" autofocus="autofocus" ng-pattern="restrictNumber" ng-class="{'input--error': formLabEdit.name.$valid == false, 'input': formLabEdit.name.$valid == true}">
+		                    <span class="chars" ng-class="{'chars--active': formLabEdit.name.$valid == false, 'chars': formLabEdit.name.$valid == true}">Use only [A-Za-z0-9_- ]chars</span>
+		                </div>
+		            </div>
+		            <div class="form-group row required">
+		                <label class="col-md-2 control-label control-label_custom_pos">Version</label>
+		                <div class="col-md-10">
+		                    <input id="version" class="form-control" name="version" ng-model="version" ng-disabled="(role == 'user')?true:false" ng-pattern="restrictTest" ng-class="{'input--error': formLabEdit.version.$valid == false, 'input': formLabEdit.version.$valid == true}">
+		                    <span class="chars" ng-class="{'chars--active': formLabEdit.version.$valid == false, 'chars': formLabEdit.version.$valid == true}">Must be interger ([0-9]chars)</span>
+		                </div>
+		            </div>
+		            <div class="form-group row">
+		                <label class="col-md-2 control-label control-label_custom_pos">Author</label>
+		                <div class="col-md-10">
+		                    <input class="form-control" name="author" ng-model="author" type="text" ng-disabled="(role == 'user')?true:false">
+		                    <span ng-show="digits.nums.$error.pattern">Numbers only, please.</span>
+		                </div>
+		            </div>
+			    <div class="form-group row">
+		                    <label class="col-md-5 control-label control-label_custom">Satellite</label>
+		                    <div class="col-md-4">
+		                        <select  data-ng-model="selectSat" data-ng-options="a for (a,b) in satArray" ng-disabled="(role == 'user')?true:false"></select>
+		                    </div>
+	                   </div>
+                           <div class="form-group">
+                                 <label class="col-md-2 control-label">Shared with</label>
+                                 <div class="col-md-10">
+                                        <ui-select multiple ng-model="shared.selected" ng-disabled="ctrl.disabled" close-on-select="false" theme="bootstrap">
+                                                <ui-select-match placeholder="Select users...">{{$item}}</ui-select-match>
+                                                <ui-select-choices repeat="username in usernames | filter:$select.search ">
+                                                        {{username}}
+                                                </ui-select-choices>
+                                        </ui-select>
+                                 </div>
+                            </div>
+
+		            <div class="form-group row">
+		                <label class="col-md-5 control-label control-label_custom" ng-disabled="(role == 'user')?true:false">Config Script Timeout</label>
+		                <div class="col-md-4">
+		                    <input class="form-control" name="scripttimeout" value="300" ng-model="scripttimeout" type="text" ng-disabled="(role == 'user')?true:false">
+		                </div>
+		                <label class="col-md-3 control-label control-label_custom">Seconds</label>
+		            </div>
+                            <div class="form-group row">
+                                <label class="col-md-5 control-label control-label_custom">Lab Countdown Timer</label>
+                                <div class="col-md-4">
+                                    <input class="form-control" name="countdown" value="0" ng-model="countdown" type="text" ng-disabled="(role == 'user')?true:false">
+                                </div>
+                                <label class="col-md-3 control-label control-label_custom">Seconds</label>
+                            </div>
+			    <div class="form-group row">
+                    		<label class="col-md-5 control-label control-label_custom">Default link width</label>
+                    		<div class="col-md-4">
+                        		<input type="number" min="0.5" max="2" step="0.5" class="form-control" data-ng-model="linkwidth" />
+                    		</div>
+                	    </div>
+			    <div class="form-group row">
+                                <label class="col-md-5 control-label control-label_custom">Display Grid</label>
+                                <div class="col-md-4">
+                                        <input type="checkbox" data-ng-model="grid" />
+                                </div>
+                            </div>
+		            <div class="row">
+		            	<div class="col-md-12 parent-required">
+							<p class="p-required"><sup class="sup-required">*</sup>- Required Fields</p>
+		            	</div>
+		            </div>
+		        </div>
+		        <div class="col-md-8">
+		        	<div class="form-group row">
+		                <label class="col-md-2 control-label">Description</label>
+		                <div class="col-md-10">
+							<textarea class="form-control" name="description" ng-model="description" rows="6" ng-disabled="(role == 'user')?true:false"></textarea>
+		                </div>
+		            </div>
+		            <div class="form-group row">
+		                <label class="col-md-2 control-label">Tasks</label>
+		                <div class="col-md-10">
+		                    <textarea class="form-control" name="body" ng-model="body" rows="6" ng-disabled="(role == 'user')?true:false"></textarea>
+		                </div>
+		            </div>
+		           
+		            <div class="form-group">
+		                <div class="col-md-2 col-md-offset-10">
+		                    <div class="pull-right"  style="width: 123px;">
+		                        <button type="submit" class="btn btn-success btn-flat" ng-changed="anychanges=true" ng-click="editLab()">Save</button>
+		                        <button type="button" class="btn btn-grey btn-flat" ng-click="closeModal()">Cancel</button>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+	    	</div>
+        </form>
+    </div>
+    <div class="modal-footer"></div>

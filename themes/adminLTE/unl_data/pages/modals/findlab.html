@@ -1,0 +1,15 @@
+<div class="modal-header">
+            <h3 class="modal-title">Find Lab</h3>
+</div>
+<div class="modal-body">
+            <form role="form">
+				<div class="form-group">
+					<label>Find lab  name containing:</label>
+					<input type="text" data-ng-model="pattern" placeholder="Pattern" />
+                		</div>
+            </form>
+</div>
+<div class="modal-footer">
+            <button class="btn btn-success btn-flat {{blockButtonsClass}}" ng-disabled="blockButtons" type="button" ng-click="Labsearch()">Find</button>
+            <button class="btn btn-default btn-flat" type="button" ng-click="closeModal()">Cancel</button>
+</div>

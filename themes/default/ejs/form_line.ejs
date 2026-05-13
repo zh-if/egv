@@ -1,0 +1,50 @@
+<form id="main-modal" class="container col-md-12 col-lg-12 add-line-form" >
+    <div class="row">
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Width</label>
+            <div class="col-md-6">
+                <input type="number" name="line[width]" min="0" class="form-control line-width" value="2">
+                </div>
+            </div> <br>
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Arrow Style</label>
+            <div class="col-md-6">
+                <select name="line[arrowstyle]" class="form-control select-block selectpicker line-arrowstyle-select">
+                    </select>
+                </div>
+            </div> <br>
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Paint Style</label>
+            <div class="col-md-6">
+                <select name="line[paintstyle]" class="form-control selectpicker line-paintstyle-select" >
+                    </select>
+                </div>
+            </div> <br>
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Line  Style</label>
+            <div class="col-md-6">
+                <select name="line[linestyle]" class="form-control selectpicker line-linestyle-select" >
+                    </select>
+                </div>
+            </div> <br>
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Line Color</label>
+            <div class="col-md-6">
+                <input name="line[color]" type="color" class="form-control line_color">
+                </div>
+            </div> <br>
+        <div class="col-md-12 col-md-offset-0 form-group">
+            <label class="col-md-3 control-label form-group-addon">Line Label</label>
+	    <div class="col-md-6">
+            	<input name="line[label]" type="text" class="form-control line-label">
+            	</div>
+	    </div> <br>
+        <button type="submit" class="btn btn-success col-md-offset-1"><%=MESSAGES[47]%></button>
+        <button type="button" class="btn" data-dismiss="modal"><%=MESSAGES[18]%></button>
+    </div>
+    <input  type="text" name="line[y1]" class="hide left-coordinate" value="<%=left%>">
+    <input  type="text" name="line[x1]" class="hide top-coordinate" value="<%=top%>">
+    <input  type="text" name="line[y2]" class="hide left2-coordinate" value="<%=left+100%>"> 
+    <input  type="text" name="line[x2]" class="hide top2-coordinate" value="<%=top%>">
+    <input  type="text" name="line[id]" class="hide top2-coordinate" value="0">
+</form>

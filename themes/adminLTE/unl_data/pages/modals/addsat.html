@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h3 class="modal-title">Add New Cluster Member</h3>
+</div>
+<div class="modal-body">
+    <form role="form" name="form">
+        <div class="form-group required">
+            <label class="control-label">Member's Name</label>
+            <input type="text" class="form-control" name="name" data-ng-model="name" placeholder="Enter member's name" autofocus
+                ng-class="{'input--error': form.name.$valid == false, 'input': form.name.$valid == true}">
+        </div>
+        <div class="form-group">
+            <label>IP address</label>
+	    <input data-inputmask="'alias': 'ip'" data-mask type="text" class="form-control" name="ip" data-ng-model="ip">
+        </div>
+	<div class="form-group required">
+            <label class="control-label">Member's Root Password</label>
+	    <input type="password" class="form-control" name="password" data-ng-model="password" placeholder="Enter member's root password" >
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn btn-success btn-flat {{blockButtonsClass}}" ng-disabled="!( name && ip)" type="button" ng-click="addSat()">Add</button>
+            <button class="btn btn-default btn-flat" type="button" ng-click="closeModal()">Cancel</button>
+        </div>
+    </form>
+</div>
+<script>
+$('[data-mask]').inputmask()
+</script>

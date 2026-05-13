@@ -1,0 +1,39 @@
+<div data-ng-include="'/themes/adminLTE/unl_data/pages/constant/header.html'" data-ng-controller="HeaderController">
+</div>
+<div class="wrapper">
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+   
+      <!-- Content Header (Page header) -->
+      <section class="content-header labmgmt">
+        <h1>
+          Lab(s) Management
+          <small>here you can manage EVE-NG Running Labs </small>
+        </h1>
+        <ol class="breadcrumb">
+			<li><a href="#/main"><i class="fa fa-home"></i></a></li>
+			<li><i class="fa fa-wrench"></i> Management</li>
+			<li class="active"><i class="fa fa-group"></i>Nodes management</li>
+        </ol>
+      </section>
+
+    <!-- Main content -->
+      <section class="content row">
+<!-- /.content -->
+       <div class="col-xs-12">
+          <div class="box">
+            <div class="box-header">
+              <h3 class="box-title">Running Lab(s)</h3>
+	    </div>
+	    <div  class="box-body" ui-grid="datagrid" >
+	    </div>
+          </div>
+       </div>
+      </section>
+  </div>
+  <!-- /.content-wrapper -->
+ </div >
+<!-- ./wrapper -->
+<!-- AdminLTE App -->
+<link rel="stylesheet" href="/themes/adminLTE/dist/css/skins/skin-blue.min.css">
+<script src="/themes/adminLTE/dist/js/app.js"></script>

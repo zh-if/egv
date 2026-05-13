@@ -1,0 +1,75 @@
+<div class="modal-header">
+    <h3 class="modal-title">Important License information</h3>
+</div>
+<div class="modal-body">
+        <div class="row">
+            <div class="col-md-10 col-md-offset-1">
+<h1 style="text-align: center;">Important License information</h1>
+
+<h3 style="text-align: center;">EVE VM recommended CPU settings</h3>
+
+<i>Set Processors “Number of processors” and Set “Cores per Socket/Processor”</i>
+<p>
+<ul>
+	<li>If your PC has single CPU, then Cores per socket will be divided by 1. Example for VM Ware Workstation, shows single CPU PC VM setup with 1 CPU with 16 cores per socket (1)</li>
+	<li>If your server has dual CPU, then Cores per socket will be divided by 2. Example for VM Ware ESXi, shows dual CPU Server VM setup with 32 CPU with 16 cores per socket (2).</li>
+</ul>
+</p>
+<p>
+<i>Enable Nested CPU virtualization</i>
+</p>
+<p>
+<font color="#3c8dbc">VM ware Workstation:</font> Set Virtualize Intel VT-x/EPT or AMD-V/RVI to the guest OS to ON (checked) and set Virtualize IOMMU to the guest OS to ON (checked)
+</br>
+<font color="#3c8dbc">ESXi:</font> Set Expose hardware assisted virtualization to the guest OS to ON (checked) and set Expose IOMMU to the guest OS to ON (checked)
+</p>
+<table style="border:undefined">
+    <tbody>
+        <tr>
+            <th>VM Ware Workstation</th>
+            <th>VM Ware ESXi</th>
+        </tr>
+        <tr>
+            <td><img style="width: 554px;" src="themes/adminLTE/unl_data/img/VMW.png" /></td>
+            <td><img style="width: 554px;" src="themes/adminLTE/unl_data/img/VME.png" /></td>
+        </tr>
+    </tbody>
+</table>
+
+<h3 style="text-align: center;">EVE-PRO re-hosting or reinstallation.</h3>
+
+<p>If you decide to re-install EVE-PRO or move it to another host, please follow the steps below:</p>
+
+<p><i>Pre-requisites:</i></p>
+
+<ul>
+    <li>EVE must have internet access!</li>
+    <li>Only ONE EVE host must be turned ON and connected to the internet, do NOT have more than one EVE with the same license turned on at the same time!</li>
+</ul>
+
+<p>Step 1. Make sure that you have only ONE EVE-PRO instance with this license running.</p>
+
+<p>Step 2. Make sure you have unrestricted Internet access with a properly configured DNS server from your EVE machine or configure the firewall rule for EVE Licensing server access and license validation: Bidirectional (in/out)&nbsp; allowed access to: https://www-eve-ng.net</p>
+
+<p>Step 3. Load your purchased license onto EVE server you want to rehost to.</p>
+
+<p>Step 4. Reboot your new EVE</p>
+
+<p>Step 5. Wait approximately 15 mins for the licence validation process to finish on the host.</p>
+
+<p><span style="color:#e74c3c;">NOTE: The re-hosted EVE server must have internet access to periodically validate the license.</span> EVE receives a token with a licence validity time of 24 hours. During those 24 hours, the re-hosted EVE can be used offline. After 24 hours the token time expires and you have to get EVE online again (for approximately 30minutes) to receive a new token.</p>
+<a href="https://www.eve-ng.net/index.php/documentation/eula/" target="_blank">End User License Agreement (EULA)</a>
+            </div>
+        </div>
+        <div class="modal-footer">
+<div class="form-group">
+       <div class="col-md-11 col-md-offset-1">
+              <div class="pull-left">
+                    <button type="submit" class="btn btn-success btn-flat" ng-changed="anychanges=true" ng-click="Continue()">OK</button>
+		     I have read license information and accept it.&nbsp;&nbsp;
+                    <button type="button" class="btn btn-danger btn-flat" ng-click="closeModal()">Cancel</button>
+		     I have to verify my EVE VM settings.
+              </div>
+       </div>
+</div>
+</div>

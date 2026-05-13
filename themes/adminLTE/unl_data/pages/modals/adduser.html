@@ -1,0 +1,126 @@
+<div class="modal-header">
+    <h3 class="modal-title">Add New User</h3>
+</div>
+<div class="modal-body">
+    <form role="form" name="form">
+        <div class="form-group required {{ (errorClass == 'has-error username') ? errorClass : ''}}">
+            <label class="control-label">User Name</label>
+            <input type="text" class="form-control" name="name" data-ng-model="username" placeholder="Enter username" autofocus ng-pattern="restrictNumber"
+                ng-class="{'input--error': form.name.$valid == false, 'input': form.name.$valid == true}">
+                <span class="chars" ng-class="{'chars--active': form.name.$valid == false, 'chars': form.name.$valid == true}">Use only [A-Za-z0-9_-.@]chars</span>
+                <span class="help-block" data-ng-show="errorClass == 'has-error username'" data-ng-bind="errorMessage"></span>
+        </div>
+	<div class="form-group">
+		<label class="control-label">Authentication</label>
+		<select data-ng-model="selectAuth" data-ng-init="selectAuth = 'internal'" data-ng-options="type for type in auths" data-ng-change="reportauth()" ></select>
+	</div>
+        <div class="form-group  {{ (errorClass == 'has-error passwd') ? errorClass : ''}}">
+            <label class="control-label">Password</label>
+            <input type="password" ng-required="(selectAuth == 'internal')" class="form-control" data-ng-model="passwd" ng-disabled="(selectAuth != 'internal')" placeholder="Enter password">
+            <span class="help-block" data-ng-show="errorClass == 'has-error passwd'" data-ng-bind="errorMessage"></span>
+        </div>
+
+        <div class="form-group  {{ (errorClass == 'has-error passwdConfirm') ? errorClass : ''}}">
+            <label class="control-label">Password Confirmation</label>
+            <input type="password" ng-required="(selectAuth == 'internal')" class="form-control" data-ng-model="passwdConfirm" ng-disabled="(selectAuth != 'internal')" placeholder="Enter password">
+            <span class="help-block chars--active" ng-show="passwdConfirm != passwd" >Passwords don't match</span>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" name="email" class="form-control" data-ng-model="email" placeholder="Enter email" ng-pattern="patternEmail"
+                ng-class="{'input--error': form.email.$valid == false, 'input': form.email.$valid == true}">
+                <span class="chars" ng-class="{'chars--active': form.email.$valid == false, 'chars': form.email.$valid == true}">Please enter an valid email</span>
+        </div>
+
+        <div class="form-group">
+            <label>Name</label>
+            <input type="text" class="form-control" data-ng-model="name" placeholder="Enter name">
+        </div>
+
+        <div class="form-group">
+            <label>Role</label>
+            <select data-ng-init="selectRole = 'Administrator'" data-ng-model="selectRole" data-ng-options="y for (x,y) in roles"></select>
+            <!--<label data-ng-bind="selectRole"></label>
+        <label data-ng-bind="roleArray[selectRole]"></label> -->
+        </div>
+	<div class="form-group">
+            <label>Console</label>
+	    <select data-ng-init="html5" data-ng-model="html5" data-ng-options="key as value for (key , value) in console"></select>
+        </div>
+        <div class="form-group" ng-if="selectRole == 'Lab User'">
+            <label>Lab</label>
+            <!--select data-ng-model="selectLab.selected" data-ng-options="lab as lab.lab+'&nbsp;('+lab.owner+')' for lab in labs track by $index" data-ng-change="reportLab()"></select-->
+            <select data-ng-model="selectLab.selected" data-ng-change="reportLab()">
+                    <option ng-repeat="lab in labs track by $index"  value="{{ $index }}">
+                    {{ (lab.spy == -1 )?lab.lab:lab.lab + "&nbsp;(" + lab.owner + ")" }}
+                    </option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Satellites</label>
+            <ui-select multiple ng-model="satObj.satSelected" ng-disabled="ctrl.disabled" on-select="checksats($item)"  on-remove="checksatsrm()"  close-on-select="false" theme="bootstrap">
+                     <ui-select-match placeholder="Select...">{{$item.name}}</ui-select-match>
+                    <ui-select-choices repeat="cursat in satsArray | filter:$select.search track by cursat.id">
+                            {{cursat.name}}
+                    </ui-select-choices>
+            </ui-select>
+        </div>
+       <div class="form-group" >
+		<div class="col-md-12" style="padding-left:0px";>
+                <label>Account Validity</label>
+		</div>
+		<div class="col-md-1" style="padding-left:0px";>
+		<label>From</label>
+		</div>
+		<div class="col-md-3">
+                <input  class="form-control input-small" data-ng-model="datestart" id="DateStartPicker" placeholder="Date">
+		</div>
+		<div class="col-md-2 bootstrap-timepicker timepicker">
+                <input  class="form-control input-small"  data-ng-model="timestart" id="TimeStartPicker" placeholder="Time">
+		</div>
+		<div class="col-md-1" style="padding-left:0px";>
+                <label>to</label>
+                </div>
+                <div class="col-md-3">
+                <input  class="form-control input-small" data-ng-model="datestop" id="DateStopPicker" placeholder="Date">
+                </div>
+                <div class="col-md-2 bootstrap-timepicker timepicker">
+                <input  class="form-control input-small"  data-ng-model="timestop" id="TimeStopPicker" placeholder="Time">
+                </div>
+                <script> $('#DateStartPicker').datepicker({ format: 'yyyy-mm-dd' });</script>
+                <script> $('#TimeStartPicker').timepicker({ 'timeFormat': 'H:i', step: 15 });</script>
+                <script> $('#DateStopPicker').datepicker({ format: 'yyyy-mm-dd' });</script>
+                <script> $('#TimeStopPicker').timepicker({ 'timeFormat': 'H:i', step: 15 });</script>
+        </div>
+        <div class="form-group required">
+            <label class="control-label">POD</label>
+            <input type="text" class="form-control"  data-ng-model="pod" placeholder="Enter pod">
+        </div>
+        <div class="form-group required">
+	     <div class="col-md-12" style="padding-left:0px;">
+		<label>Quotas</label>
+	     </div>
+	     <div class="col-md-1" style="padding-left:0px";>
+		<label>CPU</label>
+             </div>
+	     <div class="col-md-2" style="padding-left:0px";>
+                <input  type="number" class="form-control input-small" name="cpu" data-ng-model="cpu" ng-pattern="numberOnly" ng-class="{'input--error': form.cpu.$valid == false, 'input': form.cpu.$valid == true}" >
+	     </div>
+             <div class="col-md-1 offset-md-3" style="padding-left:0px";>
+                <label>RAM (GB) </label>
+	     </div>
+	     <div class="col-md-2" style="padding-left:0px";>
+		<input type="number"  class="form-control input-small" data-ng-model="ram" ng-pattern="numberOnly" ng-class="{'input--error': form.cpu.$valid == false, 'input': form.cpu.$valid == true}" >
+             </div>
+	</div>
+        <div class="row">
+            <div class="col-md-12 parent-required">
+                <p class="p-required"><sup class="sup-required">*</sup>- Required Fields</p>
+            </div>
+        </div>
+        <div class="modal-footer">
+		<button class="btn btn-success btn-flat {{blockButtonsClass}}" ng-disabled="!(form.$valid && (passwdConfirm == passwd) && passwdConfirm && username && (pod > -1))" type="button" ng-click="addNewUser()">Add</button>
+            <button class="btn btn-default btn-flat" type="button" ng-click="closeModal()">Cancel</button>
+        </div>
+    </form>
+</div>
