@@ -1,0 +1,10 @@
+#!/bin/bash
+
+job=$3
+path=$4
+if [ $job -eq 0 ] ; then \
+	env HOME=/home/pptr/ node ./print_topology.js "$@"
+else 
+	env HOME=/home/pptr/ node ./print_topology.js "$@" &
+fi
+

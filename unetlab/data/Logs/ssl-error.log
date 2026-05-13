@@ -1,0 +1,1 @@
+[Wed May 13 14:32:04.881118 2026] [ssl:warn] [pid 1862] AH01906: eve-ng.example.com:443:0 server certificate is a CA certificate (BasicConstraints: CA == TRUE !?)

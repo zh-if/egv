@@ -1,0 +1,1435 @@
+#!/usr/bin/php
+<?php
+/*
+ * @ https://EasyToYou.eu - IonCube v14 Decoder Online
+ * @ PHP 7.4
+ * @ Decoder version: 1.0.2
+ * @ Release: 10/08/2022
+ */
+
+// Decoded file for php version 74.
+require_once "/opt/unetlab/html/includes/init.php";
+if (php_sapi_name() != "cli") {
+    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][1]);
+    exit(1);
+}
+if (posix_getuid() != 0) {
+    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][2]);
+    exit(2);
+}
+umask(2);
+$options = getopt("oT:D:F:I:N:L:a:q:u:U:m:O:w:t:p:d:");
+$nodepath = "";
+$uuidpath = "";
+if (!isset($options["a"])) {
+    usage();
+    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][3]);
+    exit(3);
+}
+$action = $options["a"];
+if (in_array($action, ["cpu", "mem", "clone", "linkquality", "delete", "export", "start", "stop", "wipe", "hotlink", "delnetwork", "hotaddlink", "hotdellink", "html5Desktop", "destroyHtml5Desktop", "capture", "suspendlink", "resumelink"])) {
+    if (!isset($options["T"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][4]);
+        exit(4);
+    }
+    if ((int) $options["T"] < 0) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][5]);
+        exit(5);
+    }
+    $tenant = (int) $options["T"];
+    $tenantpath = "/opt/unetlab/tmp/" . $options["T"];
+}
+if ($action == "clone") {
+    if (!isset($options["O"])) {
+        usage();
+        exit(4);
+    }
+    if ((int) $options["O"] < 0) {
+        usage();
+        exit(5);
+    }
+    $tenant_out = (int) $options["O"];
+}
+if ($action == "delnetwork") {
+    if (!isset($options["N"])) {
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][21]);
+        exit(21);
+    }
+    $netId = (int) $options["N"];
+}
+if ($action == "uploadlic") {
+    if (!isset($options["L"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][79]);
+        exit(79);
+    }
+    $newlic = $options["L"];
+}
+if (in_array($action, ["start", "capture", "html5Desktop", "destroyHtml5Desktop"])) {
+    if (!isset($options["U"])) {
+        usage();
+        exit(4);
+    }
+    $user = $options["U"];
+}
+if (in_array($action, ["cpu", "mem"])) {
+    if (!isset($options["u"])) {
+        $uuidpath = "";
+    } else {
+        $uuidpath = "/" . $options["u"];
+    }
+}
+if (in_array($action, ["stop", "ipv6", "savesystemsettings"])) {
+    if (!isset($options["m"])) {
+        usage();
+        exit;
+    }
+    $stopmode = $options["m"];
+}
+if (in_array($action, ["clone", "linkquality", "delete", "export", "start", "stop", "hotlink", "delnetwork", "hotaddlink", "hotdellink", "capture", "suspendlink", "resumelink"])) {
+    if (!is_file($options["F"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $options["F"] . " - " . $GLOBALS["messages"][6]);
+        exit(6);
+    }
+    try {
+        $labfile = $options["F"];
+        $lab = new Lab($options["F"], $tenant);
+    } catch (Exception $e) {
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$e->getMessage()]);
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][7]);
+        exit(7);
+    }
+}
+if ($action == "wipe") {
+    if (isset($options["F"]) && is_file($options["F"])) {
+        try {
+            $lab = new Lab($options["F"], $tenant);
+        } catch (Exception $e) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$e->getMessage()]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][7]);
+            exit(7);
+        }
+    }
+    if (isset($options["u"]) && checkUuid($options["u"])) {
+        $uuidpath = "/" . $options["u"];
+    }
+}
+if (isset($options["D"])) {
+    if (0 < (int) $options["D"] && (in_array($action, ["cpu", "mem"]) || isset($lab->getNodes()[$options["D"]]))) {
+        $node_id = (int) $options["D"];
+        $nodepath = "/" . $options["D"];
+    } else {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][8]);
+        exit(8);
+    }
+}
+if ($action == "linkquality") {
+    if (!isset($options["q"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][22]);
+        exit(22);
+    }
+    $linkquality = $options["q"];
+}
+if (in_array($action, ["linkquality", "hotaddlink", "hotdellink", "capture", "suspendlink", "resumelink"])) {
+    if (!isset($options["I"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][20]);
+        exit(20);
+    }
+    $interfaceId = (int) $options["I"];
+}
+if (in_array($action, ["addsat", "delsat", "stopsat", "resetsat", "purgesat"])) {
+    if (!isset($options["I"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][20]);
+        exit(20);
+    }
+    $satid = (int) $options["I"];
+}
+if ($action == "addsat") {
+    if (!isset($options["t"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][23]);
+        exit(20);
+    }
+    $satip = (string) $options["t"];
+}
+if ($action == "addsat") {
+    if (!isset($options["d"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][25]);
+        exit(20);
+    }
+    $satname = (string) $options["d"];
+}
+if ($action == "addsat") {
+    if (!isset($options["p"])) {
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][24]);
+        exit(20);
+    }
+    $satpassword = (string) $options["p"];
+}
+
+
+if ($action == "dummy") {
+    exit(9);
+}
+
+switch ($action) {
+    case "ipv6":
+        $cmd = "sysctl -w net.ipv6.conf.pnet0.disable_ipv6=" . ($stopmode == 1 ? 0 : 1);
+        shell_exec($cmd);
+        $cmd = "sed -i /etc/gai.conf -e 's,.*precedence ::ffff:0:0/96  100.*," . ($stopmode == 1 ? "#precedence ::ffff:0:0/96  100" : "precedence ::ffff:0:0/96  100") . ",'";
+        shell_exec($cmd);
+        break;
+    case "cpu":
+        $path = $tenantpath . $uuidpath . $nodepath;
+        $output = shell_exec("echo \"scale=2;\"\$(echo \$(ps -ho %cpu \$(lsof +D " . $path . " | grep -v PID |  awk '{print \$2}' )) | sed -e 's/ /+/g' | bc ) / \$(nproc) | bc -l ");
+        echo $output;
+        break;
+    case "mem":
+        $path = $tenantpath . $uuidpath . $nodepath;
+        $output = shell_exec("echo \"scale=2;\"\$(echo \$(ps -ho %mem \$(lsof +D " . $path . " | grep -v PID |  awk '{print \$2}' )) | sed -e 's/ /+/g') | bc -l");
+        echo $output;
+        break;
+    case "cgclassify":
+        $db = checkDatabase();
+        cgclassifyPids($db);
+        break;
+    case "backupdb":
+        shell_exec("mysqldump -uroot -peve-ng --all-databases | gzip > /opt/unetlab/evedb.gz");
+        break;
+    case "restoredb":
+        shell_exec("if [ -e /opt/unetlab/evedb.gz ] ; then systemctl stop mysql ; rm -fr /var/lib/mysql/* ; mysqld --initialize-insecure ; systemctl start mysql  ; gunzip < /opt/unetlab/evedb.gz | mysql ; systemctl restart mysql ; fi");
+        break;
+    case "uploadlic":
+echo "License upload disabled";
+        break;
+    case "savesystemsettings":
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "INFO: try save system settings");
+        if (file_exists("/tmp/config.yml") && $yaml_config = yaml_parse_file("/tmp/config.yml")) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "INFO: save system settings");
+            yaml_emit_file("/opt/unetlab/html/includes/config.yml", $yaml_config);
+            if ($stopmode == 1) {
+                $proxy_server = $yaml_config["proxy"][0]["server"];
+                $proxy_port = $yaml_config["proxy"][0]["port"];
+                $proxy_user = $yaml_config["proxy"][0]["user"];
+                $proxy_password = $yaml_config["proxy"][0]["password"];
+                if ($proxy_user != "" && $proxy_password != "") {
+                    $proxy_auth = $proxy_user . ":" . $proxy_password . "@";
+                } else {
+                    $proxy_auth = "";
+                }
+                if (!$proxy_server[["" => true, "0.0.0.0" => true]] && !in_array($proxy_port, ["", "0"])) {
+                    $apt_proxy_file = "Acquire::http::Proxy \"http://" . $proxy_auth . $proxy_server . ":" . $proxy_port . "/\";" . "\n";
+                    $apt_proxy_file .= "Acquire::https::Proxy \"http://" . $proxy_auth . $proxy_server . ":" . $proxy_port . "/\";" . "\n";
+                    $apt_proxy_file .= "Acquire::ftp::Proxy \"http://" . $proxy_auth . $proxy_server . ":" . $proxy_port . "/\";" . "\n";
+                    file_put_contents("/etc/apt/apt.conf.d/00proxy", $apt_proxy_file);
+                    shell_exec("mkdir -p /etc/systemd/system/docker.service.d || true");
+                    $docker_file = "[Service]\nEnvironment=\"HTTP_PROXY=http://" . $proxy_auth . $proxy_server . ":" . $proxy_port . "\"\n";
+                    file_put_contents("/etc/systemd/system/docker.service.d/http-proxy.conf", $docker_file);
+                } else {
+                    file_put_contents("/etc/apt/apt.conf.d/00proxy", "");
+                    shell_exec("mkdir -p /etc/systemd/system/docker.service.d || true");
+                    file_put_contents("/etc/systemd/system/docker.service.d/http-proxy.conf", "");
+                }
+                shell_exec("systemctl daemon-reload ");
+                $cmd = "docker -H=tcp://127.0.0.1:4243 stop \$(docker -H=tcp://127.0.0.1:4243 ps -q)";
+                exec($cmd, $o, $rc);
+                shell_exec("systemctl restart docker");
+                $db = checkDatabase();
+                purgeDockerConsolePort($db);
+            }
+        }
+        break;
+    case "index":
+        shell_exec("CSEARCHINDEX=/opt/unetlab/labs/index /opt/unetlab/wrappers/cindex -limit 1 /opt/unetlab/labs; chmod a+r /opt/unetlab/labs/index");
+        shell_exec("duc index -d /opt/unetlab/tmp/index /opt/unetlab/tmp; chmod a+r /opt/unetlab/tmp/index");
+        break;
+    case "clearstopped":
+        $db = checkDatabase();
+        try {
+            $query = " select * from console inner join lab on console.labId = lab.id where status = 'stopped';";
+            $statement = $db->prepare($query);
+            $statement->execute();
+            foreach ($statement->fetchAll() as $row) {
+                $tenant = $row["podId"];
+                $node_id = $row["nodeId"];
+                $lab_file = BASE_DIR . "/labs/" . $row["LabName"] . ".unl";
+                $lab = new Lab($lab_file, $tenant);
+                $labId = $row["labId"];
+                $node = $lab->getNodes()[$node_id];
+                $port = $node->getPort();
+                $console = $node->getConsole();
+                $template = $node->getTemplate();
+                $sat = getSat($db, $lab, $tenant, $node_id);
+                error_log(date("M d H:i:s ") . "INFO: clearstopped stopping " . $node_id . " of lab " . $lab_file . " for pod " . $tenant . "\n");
+                foreach ($node->getEthernets() as $interface) {
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $labId, $tenant, $node_id, $interface->getId());
+                    $netId = $interface->getNetworkId();
+                    if ($netId != "") {
+                        $current_type = $lab->getNetworks()[$netId]->getNType();
+                        switch ($current_type) {
+                            case "internal":
+                            case "internal2":
+                            case "internal3":
+                                $netname = $current_type . "_" . $labId;
+                                break;
+                            case "private":
+                            case "private2":
+                            case "private3":
+                                $netname = $current_type . "_" . $tenant;
+                                break;
+                            case "bridge":
+                                $net_name = "vnet" . sprintf("%03x%04x%04x", $labId, $tenant, $netId);
+                                break;
+                            default:
+                                $netname = $current_type;
+                                disconnectInterface($netname, $tap_name);
+                                $nb = countNetPort($netname);
+                                if ($nb == 0 && $current_type[["bridge" => true, "internal" => true, "internal2" => true, "internal3" => true, "private" => true, "private2" => true, "private3" => true]]) {
+                                    delBridge($netname);
+                                }
+                        }
+                    }
+                    $cmd = "ip link del " . $tap_name;
+                    exec($cmd, $o, $rc);
+                    $cmd = "tunctl -d " . $tap_name;
+                    exec($cmd, $o, $rc);
+                }
+                foreach ($node->getSerials() as $interface) {
+                    $tap_name = "ser" . sprintf("%03x%04x%03x%02x", $labId, $tenant, $node_id, $interface->getId());
+                    $cmd = "ip link del " . $tap_name;
+                    exec($cmd, $o, $rc);
+                    $cmd = "tunctl -d " . $tap_name;
+                    exec($cmd, $o, $rc);
+                }
+                if ($template == "docker" && $console == "rdp") {
+                    $screen_if = "screen_" . $port;
+                    $cmd = "brtcl delif docker0 " . $screen_if;
+                    exec($cmd, $o, $rc);
+                    $cmd = "ip link del " . $screen_if;
+                    exec($cmd, $o, $rc);
+                }
+                clearIptables($lab->getNodes()[$node_id]->getPort());
+                freeConsolePort($db, $labId, $lab->getTenant(), $node_id);
+                error_log(date("M d H:i:s ") . "INFO: Clear console lab " . $labId . " node " . $node_id);
+                $html5db = html5_checkDatabase();
+                html5DelSession($html5db, $lab->getNodes()[$node_id]->getPort());
+                $lab->getNodes()[$node_id]->setPort(0);
+                $canDel = 1;
+                foreach ($lab->getNodes() as $node) {
+                    if (1 < $node->getStatus()) {
+                        $canDel = 0;
+                    }
+                }
+                if ($canDel == 1) {
+                    deleteRunningLabId($db, $lab->getTenant(), $lab->getId());
+                }
+            }
+            $query = "update lab set ( uuid, path, name , pod ) values ( NULL,NULL, NULL, NULL) where id not in ( select console.labId  from console ) ;";
+            $statement = $db->prepare($query);
+            $statement->execute();
+        } catch (Exception $e) {
+            error_log(date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][90025]);
+            error_log(date("M d H:i:s ") . (string) $e);
+            return -1;
+        }
+        break;
+    case "checkprocess":
+        $running = shell_exec(" echo  -n \$(pgrep -l -f checkprocess | grep sudo | wc -l )");
+        if (1 < (int) $running) {
+            exit(0);
+        }
+        $db = checkDatabase();
+        $ports = getPorts($db);
+        foreach ($ports as $row) {
+            if ($row["sat"] == 0) {
+                $rpid = shell_exec("echo -n \$(lsof -R -i :" . $row["port"] . " -Fg | grep g | sort -u | sed -e 's/g//')");
+                if ((string) $rpid != (string) $row["pid"]) {
+                    $cpid = shell_exec("echo -n \$(ps -ho \"%p\" " . $row["pid"] . ")");
+                    if ((string) $cpid == "") {
+                        $nstat = shell_exec("echo -n  \$(netstat -napt | grep " . $row["port"] . " | grep vpcs | wc -l)");
+                        if ((string) $nstat == "0") {
+                            freeConsolePort_force($db, $row["port"]);
+                            $html5db = html5_checkDatabase();
+                            html5DelSession($html5db, $row["port"]);
+                        }
+                    }
+                }
+            } else {
+                $res = httpSat($row["id"], "ping", 1);
+                if ($res["code"] == 200) {
+                    shell_exec("echo -n \$(systemctl show --property MainPID --value eveng_0@f71fe8cc-f316-454c-bc13-c0b220ede5b1@4)");
+                }
+            }
+        }
+        $uuidrunning = shell_exec("echo -n \$(pgrep -af ' -uuid '  | sed -e 's/.*-uuid //' -e 's/ .*//' | grep -v '//' | sort -u )");
+        $uuids = explode(" ", $uuidrunning);
+        foreach ($uuids as $uuid) {
+            $orphan = dbCheckUuid($db, $uuid);
+            if (!$orphan) {
+                shell_exec("pkill -f -- '-uuid'." . $uuid);
+            } else {
+                $allports = shell_exec("echo -n \$(pgrep -af " . $uuid . " | grep -- ' -C ' | sed -e 's/.* -C //' -e 's/ .*//' | grep -v '//' | sort -u)");
+                $ports = explode(" ", $allports);
+                foreach ($ports as $port) {
+                    $dbport = dbCheckPort($db, $port);
+                    if (!$dbport) {
+                        shell_exec("fuser -n tcp -k " . $port);
+                        shell_exec("pkill -f -- '-C " . $port . " .*" . $uuid . "'");
+                    }
+                }
+            }
+        }
+        $uuidrunning = shell_exec("echo -n \$(pgrep -af 'docker.* -i '  | sed -e 's/.*-i //' -e 's/ .*//' | grep -v '//' | sort -u )");
+        $uuids = explode(" ", $uuidrunning);
+        foreach ($uuids as $uuid) {
+            $orphan = dbCheckUuid($db, $uuid);
+            if (!$orphan) {
+            }
+        }
+        $allports = shell_exec("echo -n \$( pgrep -af -- \"vpcs.*-N\" | sed -e 's/.* -p //g'   -e 's/ .*//' | grep -v g | sort -u | grep -v g | sort -u)");
+        $ports = explode(" ", $allports);
+        foreach ($ports as $port) {
+            $orphan = dbCheckPort($db, $port);
+            if (!$orphan) {
+                shell_exec("pkill -f -- 'vpcs.*-p " . $port . " '");
+            }
+        }
+        $allpids = shell_exec("echo -n \$(lsof   +D /tmp -a -U -T   2>/dev/null | grep netio | awk '{print \$2}'|sort -u)");
+        $pids = explode(" ", $allpids);
+        foreach ($pids as $pid) {
+            if ($pid != "") {
+                $port = shell_exec("echo -n \$(lsof -p " . $pid . " -a -itcp -Fn | grep ^n | sed -e 's/.*://')");
+                if ($port) {
+                    $dbport = dbCheckPort($db, $port);
+                    if (!$dbport) {
+                        shell_exec("fuser -n tcp -k " . $port);
+                    }
+                }
+            }
+        }
+        $db == NULL;
+        sleep(5);
+        break;
+    case "licrequest":
+echo "License request disabled";
+        break;
+    case "delete":
+        if (isset($node_id)) {
+            if (isNodeRunning($lab->getId(), $node_id)) {
+                error_log("Node is running");
+                exit(1);
+            }
+            $cmd = "rm -rf /opt/unetlab/tmp/*/" . $lab->getId() . "/" . $node_id . "/";
+            remote_wipenode(0, -1, $lab->getId(), $node_id);
+        } else {
+            if (isLabRunning($lab->getId())) {
+                error_log("lab is runnning");
+                exit(80);
+            }
+            $cmd = "rm -rf /opt/unetlab/tmp/*/" . $lab->getId() . "/";
+            remote_wipelab(0, $lab->getId());
+        }
+        exec($cmd, $o, $rc);
+        break;
+    case "clone":
+        $new_name = $lab->getName() . "_clone";
+        echo $lab->getPath() . "/" . $lab->getFilename();
+        copy($lab->getPath() . "/" . $lab->getFilename(), $lab->getPath() . "/" . $new_name . ".unl");
+        $newlab = new Lab($lab->getPath() . "/" . $new_name . ".unl", $tenant);
+        $newlab->setId();
+        $newlab->save();
+        $old_id = $lab->getId();
+        $new_id = $newlab->getId();
+        mkdir("/opt/unetlab/tmp/" . $tenant_out . "/" . $new_id, 511, true);
+        shell_exec("cp -r /opt/unetlab/tmp/" . $tenant . "/" . $old_id . "/* /opt/unetlab/tmp/" . $tenant_out . "/" . $new_id);
+        $uuid_source = "";
+        $uuis_dest = "";
+        break;
+    case "export":
+        $db = checkDatabase();
+        $runLabId = _getRunningLabId($db, $lab->getTenant(), $lab->getId());
+        if ($runLabId == NULL) {
+        } else {
+            $port = _getConsolePort($db, $runLabId, $tenant, $node_id);
+            if (isset($node_id)) {
+                $sat = getSat($db, $lab, $tenant, $node_id);
+                $rc = export($node_id, $lab->getNodes()[$node_id], $lab, $lab->getTenant(), $port, $sat);
+                if ($rc == 80061 || $rc == 80084) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][19]);
+                    exit(19);
+                }
+                if ($rc !== 0) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][16]);
+                    exit(16);
+                }
+            } else {
+                foreach ($lab->getNodes() as $node_id => $node) {
+                    $sat = getSat($db, $lab, $tenant, $node_id);
+                    export($node_id, $node, $lab, $lab->getTenant(), $port, $sat);
+                }
+            }
+        }
+        break;
+    case "fixpermissions":
+        $cmd = "/usr/bin/find /opt/unetlab -type d -exec chown root:root {} \\; > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/usr/bin/find /opt/unetlab -type d -exec chmod 755 {} \\; > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/usr/bin/find /opt/unetlab -type d -exec chown root:root {} \\; > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/usr/bin/find /opt/unetlab -type f -exec chmod 644 {} \\; > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/scripts/* > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/config_scripts/* > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chown -R www-data:www-data /opt/unetlab/data /opt/unetlab/labs > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chown -R root:unl /opt/unetlab/tmp > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod -R g+w /opt/unetlab/tmp > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/addons/iol/bin/*.bin > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/wrappers/nsenter /opt/unetlab/wrappers/busybox /opt/unetlab/wrappers/eve-profile.sh /opt/unetlab/wrappers/udhcpc.script /opt/unetlab/wrappers/chatserver /opt/unetlab/wrappers/*_wrapper* /opt/unetlab/wrappers/c* > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/screenshot/print_topology /opt/unetlab/screenshot/print_topology.js /opt/unetlab/screenshot/node_modules/puppeteer/.local-chromium/linux-*/chrome-linux/chrome ";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/go/process-scanner";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/go/eve-helper";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod 755 /opt/unetlab/go/eve-clean";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chown root:root /tmp 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "/bin/chmod u=rwx,g=rwx,o=rwxt /tmp > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        break;
+    case "stopall":
+        $cmd = "pkill -TERM dynamips > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "pkill -TERM iol_wrapper > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "pkill -TERM qemu_wrapper > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "pkill -TERM vpcs > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        $cmd = "docker -H=tcp://127.0.0.1:4243 stop \$(docker -H=tcp://127.0.0.1:4243 ps -q)";
+        exec($cmd, $o, $rc);
+        stopSatNodes();
+        $cmd = "iptables -L -n -v -t nat | grep 'Chain EVE_PREROUTING_' | sed -e 's/Chain //' -e 's/ .*//' -e 's/.*_//' | while read line ; do iptables -t nat -D PREROUTING -j EVE_PREROUTING_\$line ; iptables -t nat -D POSTROUTING -j EVE_POSTROUTING_\$line ; iptables -t nat -F EVE_PREROUTING_\$line ; iptables -t nat -X EVE_PREROUTING_\$line ; iptables -t nat -F EVE_POSTROUTING_\$line ; iptables -t nat -X EVE_POSTROUTING_\$line   ; done";
+        exec($cmd, $o, $rc);
+        $cmd = "brctl show | grep vnet | sed 's/^\\(vnet[0-9A-Za-z]\\+\\).*/\\1/g' | while read line; do ifconfig \$line down; brctl delbr \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "brctl show | grep internal | sed 's/^\\(internal[01]?_[0-9]\\+\\).*/\\1/g' | while read line; do ifconfig \$line down; brctl delbr \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "brctl show | grep private | sed 's/^\\(private[01]?_[0-9]\\+\\).*/\\1/g' | while read line; do ifconfig \$line down; brctl delbr \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "ovs-vsctl list-br | while read line; do ovs-vsctl del-br \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "ifconfig | grep vun | cut -d' ' -f1 | while read line; do ip link delete  \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "ifconfig | grep vun | cut -d' ' -f1 | while read line; do tunctl -d \$line; done";
+        exec($cmd, $o, $rc);
+        $cmd = "find /opt/unetlab/labs/ -name \"*.lock\" -exec rm -f {} \\;";
+        exec($cmd, $o, $rc);
+        $db = checkDatabase();
+        purgeConsolePort($db);
+        purgeLabTable($db);
+        $html5db = html5_checkDatabase();
+        html5PurgeSession($html5db);
+        break;
+    case "platform":
+        $cmd = "(egrep vmx /proc/cpuinfo | grep -q ept && echo vmx )";
+        exec($cmd, $o, $rc);
+        $cmd = "/usr/sbin/dmidecode -s system-product-name";
+        exec($cmd, $o, $rc);
+        echo implode("", $o) . "\n";
+        break;
+    case "delnetwork":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        $tenant = $lab->getTenant();
+        foreach ($lab->getNodes() as $node_id => $node) {
+            foreach ($node->getEthernets() as $interface_id => $interface) {
+                if ($interface->getNetworkId() == $netId) {
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                    $current_type = $lab->getNetworks()[$netId]->getNType();
+                    switch ($current_type) {
+                        case "ovs":
+                        case "bridge":
+                            $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $netId);
+                            break;
+                        case "internal":
+                        case "internal2":
+                        case "internal3":
+                            $netname = $current_type . "_" . $runLabId;
+                            break;
+                        case "private":
+                        case "private2":
+                        case "private3":
+                            $netname = $current_type . "_" . $lab->getTenant();
+                            break;
+                        default:
+                            $netname = $current_type;
+                            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG int - net: " . $tap_name . " - " . $netname);
+                            disconnectInterface($netname, $tap_name);
+                            setLinkquality($tap_name, "0,0,0,0");
+                            if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                                $curPath = $node->getRunningPath();
+                                unlink($curPath . "/l1up_" . $interface_id);
+                                unlink($curPath . "/suspend_" . $interface_id);
+                                touch($curPath . "/l1down_" . $interface_id);
+                                $cmd = "ip link set " . $tap_name . " down";
+                                exec($cmd, $o, $rc);
+                            } else if ($node->getNtype() == "iol") {
+                                $curPath = $node->getRunningPath();
+                                unlink($curPath . "/l1_" . $interface_id);
+                            }
+                            $sat = getSat($db, $lab, $tenant, $node_id);
+                            if ($sat != 0) {
+                                $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                                exec($cmd, $o, $rc);
+                                $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                                exec($cmd, $o, $rc);
+                            }
+                    }
+                }
+            }
+        }
+        $current_type = $lab->getNetworks()[$netId]->getNType();
+        switch ($current_type) {
+            case "ovs":
+            case "bridge":
+                $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $netId);
+                break;
+            case "internal":
+            case "internal2":
+            case "internal3":
+                $netname = $current_type . "_" . $runLabId;
+                break;
+            case "private":
+            case "private2":
+            case "private3":
+                $netname = $current_type . "_" . $lab->getTenant();
+                break;
+            default:
+                $netname = $current_type;
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "LOG: remove network " . $netname);
+                if ($current_type[["bridge" => true, "internal" => true, "internal2" => true, "internal3" => true, "private" => true, "private2" => true, "private3" => true]] && countNetPort($netname) == 0) {
+                    delBridge($netname);
+                }
+        }
+        break;
+    case "linkquality":
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interfaceId);
+        setLinkquality($tap_name, $linkquality);
+        break;
+    case "hotlink":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        if (isset($node_id)) {
+            $node = $lab->getNodes()[$node_id];
+            foreach ($node->getEthernets() as $interface_id => $interface) {
+                if ($interface->getNetworkId() !== 0 && !isset($lab->getNetworks()[$interface->getNetworkId()])) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][10]);
+                    exit(10);
+                }
+                if ($interface->getNetworkId() !== 0) {
+                    $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $interface->getNetworkId());
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                    $p = ["name" => $netname, "type" => $lab->getNetworks()[$interface->getNetworkId()]->getNType(), "count" => $lab->getNetworks()[$interface->getNetworkId()]->getCount()];
+                    $rc = addNetwork($p);
+                    if ($rc !== 0) {
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][11]);
+                        exit(11);
+                    }
+                    connectInterface($netname, $tap_name);
+                }
+            }
+        }
+        break;
+    case "hotdellink":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        $node = $lab->getNodes()[$node_id];
+        if (isset($node->getSerials()[$interfaceId])) {
+            if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                $curPath = $node->getRunningPath();
+                unlink($curPath . "/suspend_" . $interfaceId);
+                unlink($curPath . "/l1up_" . $interfaceId);
+                touch($curPath . "/l1down_" . $interfaceId);
+                $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interfaceId);
+                $cmd = "ip link set " . $tap_name . " down";
+                exec($cmd, $o, $rc);
+            } else if ($node->getNtype() == "iol") {
+                $curPath = $node->getRunningPath();
+                unlink($curPath . "/l1_" . $interfaceId);
+                unlink($curPath . "/suspend_" . $interfaceId);
+            }
+        } else {
+            $net = $node->getEthernets()[$interfaceId]->getNetworkId();
+            $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $net);
+            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interfaceId);
+            if ($lab->getNetworks()[$net]->getNType() == "bridge" || $lab->getNetworks()[$net]->getNType() == "ovs") {
+                $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $net);
+            } else {
+                $netname = $lab->getNetworks()[$net]->getNType();
+            }
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG int - net: " . $tap_name . " - " . $netname);
+            disconnectInterface($netname, $tap_name);
+            if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                $curPath = $node->getRunningPath();
+                unlink($curPath . "/suspend_" . $interfaceId);
+                unlink($curPath . "/l1up_" . $interfaceId);
+                touch($curPath . "/l1down_" . $interfaceId);
+                $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interface_id);
+                $cmd = "ip link set " . $tap_name . " down";
+                exec($cmd, $o, $rc);
+            } else if ($node->getNtype() == "iol") {
+                $curPath = $node->getRunningPath();
+                unlink($curPath . "/l1_" . $interfaceId);
+                unlink($curPath . "/suspend_" . $interfaceId);
+            }
+            setLinkquality($tap_name, "0,0,0,0");
+            $sat = getSat($db, $lab, $tenant, $node_id);
+            if ($sat != 0) {
+                $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                exec($cmd, $o, $rc);
+                $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                exec($cmd, $o, $rc);
+            }
+        }
+        break;
+    case "hotaddlink":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        $node = $lab->getNodes()[$node_id];
+        if (isset($node->getSerials()[$interfaceId])) {
+            if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                unlink($curPath . "/l1down_" . $interfaceId);
+                touch($curPath . "/l1up_" . $interfaceId);
+                $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interfaceId);
+                $cmd = "ip link set " . $tap_name . " up";
+                exec($cmd, $o, $rc);
+            } else if ($node->getNtype() == "iol") {
+                $curPath = $node->getRunningPath();
+                touch($curPath . "/l1_" . $interfaceId);
+            }
+        } else {
+            $net = $node->getEthernets()[$interfaceId]->getNetworkId();
+            $current_type = $lab->getNetworks()[$net]->getNType();
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG: current type" . $current_type);
+            switch ($current_type) {
+                case "internal":
+                case "internal2":
+                case "internal3":
+                    $netname = $current_type . "_" . $runLabId;
+                    break;
+                case "private":
+                case "private2":
+                case "private3":
+                    $netname = $current_type . "_" . $tenant;
+                    break;
+                default:
+                    $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $net);
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interfaceId);
+                    if ($current_type[["bridge" => true, "internal" => true, "internal2" => true, "internal3" => true, "private" => true, "private2" => true, "private3" => true]]) {
+                        $p = ["name" => $netname, "type" => $lab->getNetworks()[$net]->getNType(), "count" => $lab->getNetworks()[$net]->getCount()];
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG: add network" . $netname);
+                        $rc = addNetwork($p);
+                    } else {
+                        $netname = $lab->getNetworks()[$net]->getNType();
+                    }
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG int - net: " . $tap_name . " - " . $netname);
+                    connectInterface($netname, $tap_name);
+                    if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                        $curPath = $node->getRunningPath();
+                        unlink($curPath . "/l1down_" . $interfaceId);
+                        touch($curPath . "/l1up_" . $interfaceId);
+                        $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interfaceId);
+                        $cmd = "ip link set " . $tap_name . " up";
+                        exec($cmd, $o, $rc);
+                    } else if ($node->getNtype() == "iol") {
+                        $curPath = $node->getRunningPath();
+                        touch($curPath . "/l1_" . $interfaceId);
+                    }
+                    $sat = getSat($db, $lab, $tenant, $node_id);
+                    if ($sat != 0) {
+                        $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                        exec($cmd, $o, $rc);
+                        $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                        exec($cmd, $o, $rc);
+                    }
+            }
+        }
+        break;
+    case "start":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        if (isset($node_id)) {
+            $sat = getSat($db, $lab, $tenant, $node_id);
+            if ($sat != 0) {
+                $res = httpSat($sat, "ping", 1);
+                if ($res["code"] != 200) {
+                    exit(27);
+                }
+            }
+            $node = $lab->getNodes()[$node_id];
+            $user = getUserById($db, $tenant);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: sat=" . $sat);
+            foreach ($node->getEthernets() as $interface) {
+                if ($interface->getNetworkId() !== 0 && !isset($lab->getNetworks()[$interface->getNetworkId()])) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][10]);
+                    exit(10);
+                }
+                if ($interface->getNetworkId() !== 0) {
+                    $current_type = $lab->getNetworks()[$interface->getNetworkId()]->getNType();
+                    switch ($current_type) {
+                        case "internal":
+                        case "internal2":
+                        case "internal3":
+                            $netname = $current_type . "_" . $runLabId;
+                            break;
+                        case "private":
+                        case "private2":
+                        case "private3":
+                            $netname = $current_type . "_" . $lab->getTenant();
+                            break;
+                        default:
+                            $netname = "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $interface->getNetworkId());
+                            $p = ["name" => $netname, "type" => $lab->getNetworks()[$interface->getNetworkId()]->getNType(), "count" => $lab->getNetworks()[$interface->getNetworkId()]->getCount()];
+                            $rc = addNetwork($p);
+                            if ($rc !== 0) {
+                                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][11]);
+                                exit(11);
+                            }
+                    }
+                }
+            }
+            $uuid = "UNKNOWN";
+            $pid = 0;
+            $uuid = $node->getUuid();
+            $port = getConsolePort($db, $runLabId, $tenant, $node_id, "HOLD");
+            $node->setPort($port);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "LOG: will start node " . $node_id . " " . $tenant . " " . $lab->getScriptTimeout() . " " . $runLabId . " " . $port);
+            if ($node->getNtype() == "docker" && $node->getConsole() == "rdp") {
+                $username = getUserById($db, $tenant);
+                if (!$username) {
+                    exit(11);
+                }
+                shell_exec("chmod a+rw -R /tmp/" . $user["username"] . " || true");
+            }
+            if ($sat == 0) {
+                $rc = start($node, $node_id, $tenant, $lab, $runLabId, $port);
+            } else {
+                $rc = remote_start($node, $node_id, $tenant, $lab, $runLabId, $port, $sat);
+            }
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][12]);
+                freeConsolePort_force($db, $port);
+                $node->setPort(0);
+                exit(12);
+            }
+            $pid = $node->getPid();
+            confirmConsolePort($db, $runLabId, $tenant, $node_id, $port, $uuid, $pid, $node->getName(), $node->getTemplate(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()) . "/" . $lab->getName(), $user["username"], $node->getRam(), $node->getCpu(), $sat);
+            foreach ($node->getEthernets() as $interface_id => $interface) {
+                if ($interface->getNetworkId() !== 0) {
+                    if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                        $curPath = $node->getRunningPath();
+                        if (file_exists($curPath . "/suspend_" . $interface_id)) {
+                            unlink($curPath . "/l1up_" . $interface_id);
+                            touch($curPath . "/l1down_" . $interface_id);
+                            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                            $cmd = "ip link set " . $tap_name . " down";
+                            exec($cmd, $o, $rc);
+                        } else {
+                            unlink($curPath . "/l1down_" . $interface_id);
+                            touch($curPath . "/l1up_" . $interface_id);
+                            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                            $cmd = "ip link set " . $tap_name . " up";
+                            exec($cmd, $o, $rc);
+                        }
+                    } else if ($node->getNtype() == "iol") {
+                        $curPath = $node->getRunningPath();
+                        if (file_exists($curPath . "/suspend_" . $interface_id)) {
+                            unlink($curPath . "/l1_" . $interface_id);
+                        } else {
+                            touch($curPath . "/l1_" . $interface_id);
+                        }
+                    }
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                    setLinkquality($tap_name, $interface->getLinkDelay() . "," . $interface->getLinkJitter() . "," . $interface->getLinkLoss() . "," . $interface->getLinkBandwidth());
+                } else if ($node->getNtype() == "qemu" || $node->getNtype() == "docker") {
+                    $curPath = $node->getRunningPath();
+                    unlink($curPath . "/l1up_" . $interface_id);
+                    touch($curPath . "/l1down_" . $interface_id);
+                    unlink($curPath . "/suspend_" . $interface_id);
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interface_id);
+                    $cmd = "ip link set " . $tap_name . " down";
+                    exec($cmd, $o, $rc);
+                } else if ($node->getNtype() == "iol") {
+                    $curPath = $node->getRunningPath();
+                    unlink($curPath . "/l1_" . $interface_id);
+                    unlink($curPath . "/suspend_" . $interface_id);
+                }
+            }
+            foreach ($node->getSerials() as $interface_id => $interface) {
+                if ($interface->getRemoteId() !== 0) {
+                    $curPath = $node->getRunningPath();
+                    touch($curPath . "/l1_" . $interface_id);
+                    unlink($curPath . "/suspend_" . $interface_id);
+                } else {
+                    $curPath = $node->getRunningPath();
+                    unlink($curPath . "/l1_" . $interface_id);
+                    unlink($curPath . "/suspend_" . $interface_id);
+                }
+            }
+            if ($sat != 0) {
+                $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                exec($cmd, $o, $rc);
+                $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+                exec($cmd, $o, $rc);
+            }
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: node " . $node_id);
+        } else {
+            foreach ($lab->getNetworks() as $network_id => $network) {
+                $p = ["name" => "vnet" . sprintf("%03x%04x%04x", $runLabId, $lab->getTenant(), $network_id), "type" => $network->getNType()];
+                $rc = addNetwork($p);
+                if ($rc !== 0) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][11]);
+                    exit(11);
+                }
+            }
+            foreach ($lab->getNodes() as $node_id => $node) {
+                if ($node->getNType() != "iol") {
+                    $port = getConsolePort($db, $runLabId, $tenant, $node_id);
+                    $lab->getNodes()[$node_id]->setPort($port);
+                    $rc = start($node, $node_id, $tenant, $lab->getNetworks(), $lab->getScriptTimeout(), $runLabId, $port);
+                    if ($rc !== 0) {
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][12]);
+                        exit(12);
+                    }
+                }
+            }
+            foreach ($lab->getNodes() as $node_id => $node) {
+                if ($node->getNType() == "iol") {
+                    $port = getConsolePort($db, $runLabId, $tenant, $node_id);
+                    $lab->getNodes()[$node_id]->setPort($port);
+                    $rc = start($node, $node_id, $tenant, $lab->getNetworks(), $lab->getScriptTimeout(), $runLabId, $port);
+                    if ($rc !== 0) {
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][$rc]);
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][12]);
+                        exit(12);
+                    }
+                }
+            }
+        }
+        break;
+    case "update":
+        $cmd = "curl -s http://www.google.com > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            exit(18);
+        }
+        $cmd = "apt-get -o APT::List-Cleanup=0 -o Dir::Etc::sourcelist=\"/etc/apt/sources.list.d/unetlab.list\" -o Dir::Etc::sourceparts=\"/var/tmp/\" update > /dev/null 2>&1";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            exit(17);
+        }
+        $cmd = "dpkg -s unetlab | grep Version | sed \"s/Version: //\"";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            exit(17);
+        }
+        $installed_version = $o[0];
+        $cmd = "apt-cache show unetlab | grep Version | head -n1 | sed \"s/Version: //\"";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            exit(17);
+        }
+        $available_version = $o[0];
+        if ($installed_version != $available_version) {
+            $cmd = "apt-get -y install unetlab";
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                exit(17);
+            }
+        }
+        break;
+    case "wipe":
+        $db = checkDatabase();
+        if (isset($node_id) && isset($lab)) {
+            $sat = getSat($db, $lab, $tenant, $node_id);
+            $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+            if (1 < $lab->getNodes()[$node_id]->getStatus()) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG: node state: " . $lab->getNodes()[$node_id]->getStatus());
+                if ($sat == 0) {
+                    stop($lab, $runLabId, $tenant, $lab->getNodes()[$node_id], 1);
+                } else {
+                    remote_stop($lab, $runLabId, $tenant, $lab->getNodes()[$node_id], 1, $sat);
+                }
+            }
+            if ($lab->getNodes()[$node_id]->getNType() == "docker") {
+                $cmd = "/usr/bin/docker -H=tcp://127.0.0.1:4243 rm " . $lab->getNodes()[$node_id]->getUuid();
+                exec($cmd, $o, $rc);
+                if ($rc !== 0) {
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                }
+            }
+            $cmd = "rm -rf \"/opt/unetlab/tmp/" . $tenant . "/" . $lab->getId() . "/" . $node_id . "/\"";
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                exit(13);
+            }
+            $scanned_directory = array_diff(scandir("/opt/unetlab/tmp/" . $tenant . "/" . $lab->getId() . "/"), ["..", "."]);
+            if (count($scanned_directory) == 0) {
+                $cmd = "rm -rf /opt/unetlab/tmp/" . $tenant . "/" . $lab->getId() . "/";
+                exec($cmd, $o, $rc);
+                deleteRunningLabId($db, $lab->getTenant(), $lab->getId());
+            }
+            remote_wipenode(0, $tenant, $lab->getId(), $node_id);
+        } else if (isset($lab)) {
+            foreach ($lab->getNodes() as $node_id => $node) {
+                $sat = getSat($db, $lab, $tenant, $node_id);
+                $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+                if ($sat == 0) {
+                    stop($lab, $runLabId, $tenant, $node, 1);
+                } else {
+                    remote_stopnode($lab, $runLabId, $tenant, $node, 1, $sat);
+                    remote_wipenodes($sat, $tenant, $lab->getId());
+                }
+                if ($sat == 0 && $lab->getNodes()[$node_id]->getNType() == "docker") {
+                    $cmd = "/usr/bin/docker -H=tcp://127.0.0.1:4243 rm " . $lab->getNodes()[$node_id]->getUuid();
+                    exec($cmd, $o, $rc);
+                    if ($rc !== 0) {
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                        error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                    }
+                }
+            }
+            $cmd = "rm -rf /opt/unetlab/tmp/" . $tenant . "/" . $lab->getId() . "/\"";
+            remote_wipenodes(0, $tenant, $lab->getId());
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                exit(13);
+            }
+        } else if (isset($uuidpath) && isset($tenant) && isset($node_id)) {
+            $cmd = "rm -rf \"/opt/unetlab/tmp/" . $tenant . "/" . $uuidpath . "/" . $node_id . "/\"";
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                exit(13);
+            }
+            remote_wipenode(0, $tenant, $uuidpath, $node_id);
+            $scanned_directory = array_diff(scandir("/opt/unetlab/tmp/" . $tenant . "/" . $uuidpath . "/"), ["..", "."]);
+            if (count($scanned_directory) == 0) {
+                $cmd = "rm -rf \"/opt/unetlab/tmp/" . $tenant . "/" . $uuidpath . "/";
+                exec($cmd, $o, $rc);
+            }
+        } else if (isset($uuidpath) && isset($tenant)) {
+            $cmd = "rm -rf \"/opt/unetlab/tmp/" . $tenant . "/" . $uuidpath . "/\"";
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                exit(13);
+            }
+            remote_wipenodes(0, $tenant, $uuidpath);
+            $db = checkDatabase();
+            $query = "delete from disk_usage where LabUuid = '" . $uuidpath . "' and podId = " . $tenant . ";";
+            $statement = $db->prepare($query);
+            $statement->execute();
+        } else {
+            $cmd = "rm -rf \"/opt/unetlab/tmp/" . $tenant . "\"";
+            error_log(date("M d H:i:s ") . $cmd);
+            exec($cmd, $o, $rc);
+            if ($rc !== 0) {
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+                error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+                exit(13);
+            }
+            remote_wipepod(0, $tenant);
+        }
+        break;
+    case "stop":
+        if (!checkUsername($lab->getTenant())) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][14]);
+            exit(14);
+        }
+        $db = checkDatabase();
+        if (isset($node_id)) {
+            $node = $lab->getNodes()[$node_id];
+            $port = $node->getPort();
+            $console = $node->getConsole();
+            $template = $node->getTemplate();
+            $sat = getSat($db, $lab, $tenant, $node_id);
+            $labId = _getRunningLabId($db, $lab->getTenant(), $lab->getId());
+            $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+            if ($sat == 0) {
+                $rc = stop($lab, $runLabId, $tenant, $lab->getNodes()[$node_id], $stopmode);
+            } else {
+                $rc = remote_stop($lab, $runLabId, $tenant, $lab->getNodes()[$node_id], $stopmode, $sat);
+            }
+            if ($rc != 0) {
+                exit(26);
+            }
+            $labId = _getRunningLabId($db, $lab->getTenant(), $lab->getId());
+            foreach ($node->getEthernets() as $interface) {
+                $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $labId, $tenant, $node_id, $interface->getId());
+                $netId = $interface->getNetworkId();
+                if ($netId != "") {
+                    $current_type = $lab->getNetworks()[$netId]->getNType();
+                    switch ($current_type) {
+                        case "internal":
+                        case "internal2":
+                        case "internal3":
+                            $netname = $current_type . "_" . $labId;
+                            break;
+                        case "private":
+                        case "private2":
+                        case "private3":
+                            $netname = $current_type . "_" . $tenant;
+                            break;
+                        case "bridge":
+                            $netname = "vnet" . sprintf("%03x%04x%04x", $labId, $tenant, $netId);
+                            break;
+                        default:
+                            $netname = $current_type;
+                            disconnectInterface($netname, $tap_name);
+                            $nb = countNetPort($netname);
+                            if ($nb == 0 && $current_type[["bridge" => true, "internal" => true, "internal2" => true, "internal3" => true, "private" => true, "private2" => true, "private3" => true]]) {
+                                delBridge($netname);
+                            }
+                    }
+                }
+                $cmd = "ip link del " . $tap_name;
+                exec($cmd, $o, $rc);
+                $cmd = "tunctl -d " . $tap_name;
+                exec($cmd, $o, $rc);
+            }
+            foreach ($node->getSerials() as $interface) {
+                $tap_name = "ser" . sprintf("%03x%04x%03x%02x", $labId, $tenant, $node_id, $interface->getId());
+                $cmd = "ip link del " . $tap_name;
+                exec($cmd, $o, $rc);
+                $cmd = "tunctl -d " . $tap_name;
+                exec($cmd, $o, $rc);
+            }
+            if ($template == "docker" && $console == "rdp") {
+                $screen_if = "screen_" . $port;
+                $cmd = "brctl delif docker0 " . $screen_if;
+                exec($cmd, $o, $rc);
+                $cmd = "ip link del " . $screen_if;
+                exec($cmd, $o, $rc);
+            }
+            freeConsolePort($db, $labId, $lab->getTenant(), $node_id);
+            $html5db = html5_checkDatabase();
+            html5DelSession($html5db, $lab->getNodes()[$node_id]->getPort());
+            $lab->getNodes()[$node_id]->setPort(0);
+            $canDel = 1;
+            foreach ($lab->getNodes() as $node) {
+                if (1 < $node->getStatus()) {
+                    $canDel = 0;
+                }
+            }
+            if ($canDel == 1) {
+                deleteRunningLabId($db, $lab->getTenant(), $lab->getId());
+            }
+        } else {
+            $labID = getRunningLabId($db, $lab->getTenant(), $lab->getId());
+            foreach ($lab->getNodes() as $node) {
+                $rc = stop($lab, $LabId, $tenant, $node, $stopmode);
+                foreach ($node->getEthernets() as $interface) {
+                    $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $labId, $tenant, $node->getId(), $interface->getId());
+                    $netId = $interface->getNetworkId();
+                    if ($netId != "") {
+                        $netname = "vnet" . sprintf("%03x%04x%04x", $labId, $tenant, $netId);
+                        disconnectInterface($netname, $tap_name);
+                        $nb = countNetPort($netname);
+                        if ($nb == 0 && $lab->getNetworks()[$interface->getNetworkId()]->getNType()[["bridge" => true, "internal" => true, "internal2" => true, "internal3" => true, "private" => true, "private2" => true, "private3" => true]]) {
+                            delBridge($netname);
+                        }
+                    }
+                    $cmd = "ip link del " . $tap_name;
+                    exec($cmd, $o, $rc);
+                    $cmd = "tunctl -d " . $tap_name;
+                    exec($cmd, $o, $rc);
+                    error_log(date("M d H:i:s ") . date("M d H:i:s ") . "LOG: remove tap " . $tap_name);
+                }
+                $html5db = html5_checkDatabase();
+                html5DelSession($html5db, $lab->getNodes()[$node_id]->getPort());
+                freeConsolePort($db, $labId, $lab->getTenant(), $node->getId());
+            }
+            deleteRunningLabId($db, $lab->getTenant(), $lab->getId());
+        }
+        purgeLabtable($db);
+        break;
+    case "cpulimitoff":
+        $cmd = "systemctl stop cpulimit.service";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        error_log(date("M d H:i:s ") . implode("\n", $o));
+        $cmd = "systemctl disable cpulimit.service";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        error_log(date("M d H:i:s ") . implode("\n", $o));
+        break;
+    case "cpulimiton":
+        $cmd = "systemctl start cpulimit.service";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        $cmd = "systemctl enable cpulimit.service";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        break;
+    case "uksmoff":
+        $cmd = "echo 0 > /sys/kernel/mm/uksm/run";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        $cmd = "echo 0 > /opt/unetlab/uksm";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        break;
+    case "uksmon":
+        $cmd = "echo 1 > /sys/kernel/mm/uksm/run";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        $cmd = "echo 1 > /opt/unetlab/uksm";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        break;
+    case "ksmoff":
+        $cmd = "echo 0 > /sys/kernel/mm/ksm/run";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        $cmd = "echo 0 > /opt/unetlab/ksm";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        break;
+    case "ksmon":
+        $cmd = "echo 1 > /sys/kernel/mm/ksm/run";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        $cmd = "echo 1 > /opt/unetlab/ksm";
+        exec($cmd, $o, $rc);
+        if ($rc !== 0) {
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][13]);
+            error_log(date("M d H:i:s ") . date("M d H:i:s ") . implode("\n", $o));
+            exit(13);
+        }
+        break;
+    case "html5Desktop":
+        $db = checkDatabase();
+        $port = getConsolePort($db, 0, $tenant, 0, "HOLD");
+        $desktopUrl = createHtml5Desktop($user, $port, $tenant);
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "DEBUG: " . $desktopUrl);
+        confirmConsolePort($db, 0, $tenant, 0, $port, "html5Desktop_" . $user, 0, "html5Desktop_" . $user, "docker", 0, $user, 0, 0, 0);
+        echo $desktopUrl;
+        break;
+    case "destroyHtml5Desktop":
+        echo $user;
+        $db = checkDatabase();
+        $port = getConsolePort($db, 0, $tenant, 0, "HOLD");
+        $cmd = "docker -H 127.0.0.1:4243 stop html5Desktop-" . $user;
+        exec($cmd, $o, $rc);
+        $cmd = "docker -H 127.0.0.1:4243 rm html5Desktop-" . $user;
+        exec($cmd, $o, $rc);
+        freeConsolePort($db, 0, $tenant, 0);
+        break;
+    case "suspendlink":
+        $db = checkDatabase();
+        $curPath = $lab->getNodes()[$node_id]->getRunningPath();
+        $node = $lab->getNodes()[$node_id];
+        $tenant = $lab->getTenant();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        if ($lab->getNodes()[$node_id]->getNtype() == "qemu" || $lab->getNodes()[$node_id]->getNtype() == "docker") {
+            unlink($curPath . "/l1up_" . $interfaceId);
+            touch($curPath . "/l1down_" . $interfaceId);
+            touch($curPath . "/suspend_" . $interfaceId);
+            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interfaceId);
+            $cmd = "ip link set " . $tap_name . " down";
+            exec($cmd, $o, $rc);
+        } else if ($lab->getNodes()[$node_id]->getNtype() == "iol") {
+            unlink($curPath . "/l1_" . $interfaceId);
+            touch($curPath . "/suspend_" . $interfaceId);
+        }
+        $sat = getSat($db, $lab, $tenant, $node_id);
+        if ($sat != 0) {
+            $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+            exec($cmd, $o, $rc);
+            $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+            exec($cmd, $o, $rc);
+        }
+        break;
+    case "resumelink":
+        $db = checkDatabase();
+        $curPath = $lab->getNodes()[$node_id]->getRunningPath();
+        $node = $lab->getNodes()[$node_id];
+        $tenant = $lab->getTenant();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        if ($lab->getNodes()[$node_id]->getNtype() == "qemu" || $lab->getNodes()[$node_id]->getNtype() == "docker") {
+            unlink($curPath . "/suspend_" . $interfaceId);
+            unlink($curPath . "/l1down_" . $interfaceId);
+            touch($curPath . "/l1up_" . $interfaceId);
+            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $lab->getTenant(), $node_id, $interfaceId);
+            $cmd = "ip link set " . $tap_name . " up";
+            exec($cmd, $o, $rc);
+        } else if ($lab->getNodes()[$node_id]->getNtype() == "iol") {
+            touch($curPath . "/l1_" . $interfaceId);
+            unlink($curPath . "/suspend_" . $interfaceId);
+        }
+        $sat = getSat($db, $lab, $tenant, $node_id);
+        if ($sat != 0) {
+            $cmd = "rsync -av --delete --include='l1*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+            exec($cmd, $o, $rc);
+            $cmd = "rsync -av --delete --include='suspend*' --exclude='*' " . $node->getRunningPath() . "/ 172.29.130." . $sat . ":" . $node->getRunningPath();
+            exec($cmd, $o, $rc);
+        }
+        break;
+    case "capture":
+        $db = checkDatabase();
+        $runLabId = getRunningLabId($db, $lab->getTenant(), $lab->getId(), preg_replace("/^\\/opt\\/unetlab\\/labs/", "", $lab->getPath()), $lab->getName());
+        $node = $lab->getNodes()[$node_id];
+        if (isset($node->getSerials()[$interfaceId])) {
+            $tap_name = "ser" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interfaceId);
+        } else {
+            $tap_name = "vun" . sprintf("%03x%04x%03x%02x", $runLabId, $tenant, $node_id, $interfaceId);
+        }
+        $captureId = ($runLabId << 20) + ($node_id << 10) + $interfaceId;
+        $port = getConsolePort($db, 0, $tenant, $captureId, "HOLD");
+        $captureUrl = createCapture($port, $node, $tap_name, $captureId);
+        confirmConsolePort($db, 0, $tenant, $captureId, $port, "Capture_" . $tap_name, 0, "Capture_" . $tap_name, "docker", $lab->getName(), $user, 0, 0, 0);
+        shell_exec("mkdir /tmp/" . $user . " || true");
+        shell_exec("chown -R " . $user . " /tmp/" . $user . " || true");
+        echo $port;
+        break;
+    case "addsat":
+        $db = checkDatabase();
+        $rc = addClusterSatDb($db, $satid, $satname, $satip, $satpassword);
+        if ($rc != 0) {
+            $rc = $rc - 99900;
+            exit($rc);
+        }
+        break;
+    case "delsat":
+        $db = checkDatabase();
+        $rc = delClusterSatDb($db, $satid);
+        if ($rc != 0) {
+            $rc = $rc - 99900;
+            exit($rc);
+        }
+        break;
+    case "updatesat":
+        error_reporting(0);
+        updateSat();
+        break;
+    case "showcluster":
+        error_reporting(0);
+        showCluster();
+        break;
+    case "stopsat":
+        stopClusterMember($satid);
+        break;
+    case "resetsat":
+        resetClusterMember($satid);
+        exit(0);
+        break;
+    default:
+        usage();
+        error_log(date("M d H:i:s ") . date("M d H:i:s ") . "ERROR: " . $GLOBALS["messages"][9]);
+        exit(9);
+}
+
+?>

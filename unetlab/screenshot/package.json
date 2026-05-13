@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "md5": "^2.3.0",
+    "puppeteer": "^23.2.1"
+  }
+}

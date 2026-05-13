@@ -1,0 +1,32 @@
+ErrorException: file_get_contents(): SSL operation failed with code 1. OpenSSL Error messages:
+error:0A000086:SSL routines::certificate verify failed in /opt/unetlab/html/includes/functions.php:1127
+Stack trace:
+#0 [internal function]: Slim\Slim::handleErrors()
+#1 /opt/unetlab/html/includes/functions.php(1127): file_get_contents()
+#2 /opt/unetlab/html/includes/api_authentication.php(171): updateUserToken()
+#3 /opt/unetlab/html/api.php(91): apiLogin()
+#4 [internal function]: {closure}()
+#5 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#7 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#8 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#9 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#10 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#11 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#12 {main}
+ErrorException: file_get_contents(): SSL operation failed with code 1. OpenSSL Error messages:
+error:0A000086:SSL routines::certificate verify failed in /opt/unetlab/html/includes/functions.php:1127
+Stack trace:
+#0 [internal function]: Slim\Slim::handleErrors()
+#1 /opt/unetlab/html/includes/functions.php(1127): file_get_contents()
+#2 /opt/unetlab/html/includes/api_authentication.php(171): updateUserToken()
+#3 /opt/unetlab/html/api.php(91): apiLogin()
+#4 [internal function]: {closure}()
+#5 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#7 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#8 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#9 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#10 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#11 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#12 {main}

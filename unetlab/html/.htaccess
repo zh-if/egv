@@ -1,0 +1,64 @@
+# vim: syntax=apache tabstop=4 softtabstop=0 noexpandtab laststatus=1 ruler
+
+# supress php errors
+php_flag display_startup_errors off
+php_flag display_errors off
+php_flag html_errors off
+php_value memory_limit 512M
+
+# enable PHP error logging
+php_flag log_errors on
+php_value error_log /opt/unetlab/data/Logs/php_errors.txt
+
+# PHP settings
+php_value session.gc_maxlifetime 86400
+php_value post_max_size 1024M
+php_value upload_max_filesize 1024M
+
+
+<Files ./eve-ng.lic>
+Order Allow,Deny
+Deny from all
+</Files>
+
+<Files ./eve-ng.lic.bkp>
+Order Allow,Deny
+Deny from all
+</Files>
+
+
+# TODO
+# ErrorDocument 403 /error.php
+
+<IfModule mod_rewrite.c>
+	# http://httpd.apache.org/docs/2.4/rewrite/flags.html
+	RewriteEngine On
+	RewriteBase /
+
+	# If starts with /api, call API router
+	RewriteCond %{REQUEST_URI} ^/api/
+	RewriteRule ^(.*)$ /api.php [B,L,QSA]
+
+	# If starts with /auth, call Opauth
+	RewriteCond %{REQUEST_URI} ^/auth/
+	RewriteRule ^(.*)$ /auth.php [B,L,QSA]
+	
+	RewriteCond %{REQUEST_URI} ^/legacy/
+	RewriteRule ^(.*)$ /themes/default/ [B,L,QSA]
+
+	#Meet 
+	RewriteCond %{REQUEST_URI} ^/meet/
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteRule ^(.*)$ /meet/index.html
+
+	# If not an auth call, if not a dir and if not a file, call the theme
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_URI} !^/meet/
+	#RewriteRule ^(.*)$ /themes/default/$1 [B,L,QSA]
+	RewriteRule ^(.*)$ /themes/adminLTE/$1 [B,L,QSA]
+
+	# If URL is empty, call the theme
+	#RewriteRule ^$ /themes/default/ [B,L,QSA]
+	RewriteRule ^$ /themes/adminLTE/ [B,L,QSA]
+</IfModule>

@@ -1,0 +1,29 @@
+---
+#RADIUS  Settings
+radius:
+  - server: 0.0.0.0
+    port: 1812
+    secret: secret
+  - server: 0.0.0.0
+    port: 1812
+    secret: secret
+
+#Proxy settings
+proxy:
+  - server: 0.0.0.0
+    port: 0
+
+# Disk minimal size (GB) to permit start node
+mindisk: 10
+
+# Display or not templates w/o images
+# choose between : missing or hided 
+template_disabled: missing
+
+# tyerminal color-scheme
+
+color-scheme: black-white
+# Networks
+vpn_net: 172.29.130
+docker_net: "172.17"
+nat_net: 172.29.129

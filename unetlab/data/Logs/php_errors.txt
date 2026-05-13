@@ -1,0 +1,154 @@
+[13-May-2026 14:58:42 UTC] PHP Warning:  require_once(/opt/unetlab/html/includes/api_capture.php): Failed to open stream: No such file or directory in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:42 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/opt/unetlab/html/includes/api_capture.php' (include_path='.:/usr/share/php') in /opt/unetlab/html/api.php:26
+Stack trace:
+#0 {main}
+  thrown in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:43 UTC] PHP Warning:  require_once(/opt/unetlab/html/includes/api_capture.php): Failed to open stream: No such file or directory in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:43 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/opt/unetlab/html/includes/api_capture.php' (include_path='.:/usr/share/php') in /opt/unetlab/html/api.php:26
+Stack trace:
+#0 {main}
+  thrown in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:43 UTC] PHP Warning:  require_once(/opt/unetlab/html/includes/api_capture.php): Failed to open stream: No such file or directory in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:43 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/opt/unetlab/html/includes/api_capture.php' (include_path='.:/usr/share/php') in /opt/unetlab/html/api.php:26
+Stack trace:
+#0 {main}
+  thrown in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:52 UTC] PHP Warning:  require_once(/opt/unetlab/html/includes/api_capture.php): Failed to open stream: No such file or directory in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:52 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/opt/unetlab/html/includes/api_capture.php' (include_path='.:/usr/share/php') in /opt/unetlab/html/api.php:26
+Stack trace:
+#0 {main}
+  thrown in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:54 UTC] PHP Warning:  require_once(/opt/unetlab/html/includes/api_capture.php): Failed to open stream: No such file or directory in /opt/unetlab/html/api.php on line 26
+[13-May-2026 14:58:54 UTC] PHP Fatal error:  Uncaught Error: Failed opening required '/opt/unetlab/html/includes/api_capture.php' (include_path='.:/usr/share/php') in /opt/unetlab/html/api.php:26
+Stack trace:
+#0 {main}
+  thrown in /opt/unetlab/html/api.php on line 26
+[13-May-2026 15:01:13 UTC] PHP Warning:  fopen(/opt/unetlab/data/Logs/api.txt): Failed to open stream: Permission denied in /opt/unetlab/html/api.php on line 30
+[13-May-2026 15:01:13 UTC] PHP Fatal error:  Uncaught InvalidArgumentException: Cannot create LogWriter. Invalid resource handle. in /opt/unetlab/html/includes/Slim/LogWriter.php:60
+Stack trace:
+#0 /opt/unetlab/html/api.php(30): Slim\LogWriter->__construct()
+#1 {main}
+  thrown in /opt/unetlab/html/includes/Slim/LogWriter.php on line 60
+[13-May-2026 15:08:31 UTC] updateUserToken: Failed to get token for user admin
+[13-May-2026 15:08:31 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:10:01 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:10:40 UTC] updateUserToken: Failed to get token for user admin
+[13-May-2026 15:11:13 UTC] updateUserToken: Failed to get token for user admin
+[13-May-2026 15:11:22 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:11:49 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:18:35 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:18:58 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 15:19:01 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 16:01:13 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 16:01:22 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
+[13-May-2026 16:01:32 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "BASE_LAB" in /opt/unetlab/html/api.php:127
+Stack trace:
+#0 [internal function]: {closure}()
+#1 /opt/unetlab/html/includes/Slim/Route.php(468): call_user_func_array()
+#2 /opt/unetlab/html/includes/Slim/Slim.php(1357): Slim\Route->dispatch()
+#3 /opt/unetlab/html/includes/Slim/Middleware/Flash.php(85): Slim\Slim->call()
+#4 /opt/unetlab/html/includes/Slim/Middleware/MethodOverride.php(92): Slim\Middleware\Flash->call()
+#5 /opt/unetlab/html/includes/Slim/Middleware/PrettyExceptions.php(67): Slim\Middleware\MethodOverride->call()
+#6 /opt/unetlab/html/includes/Slim/Slim.php(1302): Slim\Middleware\PrettyExceptions->call()
+#7 /opt/unetlab/html/api.php(1702): Slim\Slim->run()
+#8 {main}
+  thrown in /opt/unetlab/html/api.php on line 127
